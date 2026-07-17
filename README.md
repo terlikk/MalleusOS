@@ -16,12 +16,17 @@ i tryb kiosku na wbudowany ekranik LCD.
 
 ## Co potrafi
 
-- **Metryki na żywo** — CPU, RAM, dyski, sieć i temperatury prosto
-  z `/proc` i `/sys`, odświeżane co sekundę.
+- **Metryki na żywo** — wykresy CPU, RAM, dysków, sieci i temperatur
+  odświeżane co sekundę, historia 15 min – 2 h, progi ostrzegawcze 70/90%.
 - **Kontenery jednym kliknięciem** — start, stop, restart i logi na żywo,
   bez wpisywania komend.
-- **Katalog aplikacji** — instalacja popularnych usług homelabowych jednym
+- **Katalog aplikacji** — Jellyfin (własny Netflix), Nextcloud (własna
+  chmura), Pi-hole (blokowanie reklam), Samba (dysk sieciowy), Uptime Kuma
+  (monitoring usług), Kiwix (Wikipedia offline) — instalacja jednym
   kliknięciem, adresy w rodzaju `nazwa.malleus.local`.
+- **Deploy własnych aplikacji** — wskazujesz repozytorium git albo ZIP,
+  serwer buduje i uruchamia projekt, logi budowania na żywo.
+- **Panel zamknięty na hasło** — logowanie od pierwszego uruchomienia.
 - **Tryb kiosku** — widok metryk pod mały panoramiczny ekran LCD.
 
 ## Jak to działa

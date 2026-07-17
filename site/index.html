@@ -43,26 +43,42 @@
       <div class="features">
         <article class="feature">
           <h3>Metryki na żywo</h3>
-          <p>CPU, RAM, dyski, sieć i temperatury — co sekundę,
-             prosto z <code>/proc</code> i <code>/sys</code>.</p>
+          <p>Wykresy CPU, RAM, sieci, dysków i temperatur odświeżane
+             co sekundę, z historią od 15 minut do 2 godzin. Kolory
+             ostrzegają, gdy coś przekracza 70 i 90%.</p>
         </article>
 
         <article class="feature">
           <h3>Kontenery jednym kliknięciem</h3>
-          <p>Start, stop, restart i logi Dockera na żywo,
-             bez wpisywania komend.</p>
+          <p>Lista wszystkiego, co chodzi w Dockerze: start, stop
+             i restart przyciskiem, a logi płyną na ekranie na żywo —
+             bez wpisywania ani jednej komendy.</p>
         </article>
 
         <article class="feature">
-          <h3>Katalog aplikacji</h3>
-          <p>Jellyfin, Nextcloud, Pi-hole i inne — instalacja
-             jednym kliknięciem.</p>
+          <h3>Katalog gotowych aplikacji</h3>
+          <p>Domowe usługi instalowane jednym kliknięciem — każda od
+             razu pod własnym adresem w rodzaju
+             <code>filmy.malleus.local</code>.</p>
+        </article>
+
+        <article class="feature">
+          <h3>Deploy własnych aplikacji</h3>
+          <p>Wklejasz link do repozytorium git albo ZIP — serwer sam
+             zbuduje i uruchomi Twój projekt, a Ty oglądasz logi
+             budowania na żywo.</p>
+        </article>
+
+        <article class="feature">
+          <h3>Zamknięty na hasło</h3>
+          <p>Panel wymaga logowania od pierwszego uruchomienia.
+             Wszystko dzieje się lokalnie, w Twojej sieci.</p>
         </article>
 
         <article class="feature">
           <h3>Tryb kiosku</h3>
-          <p>Widok metryk pod mały ekran LCD
-             w obudowie serwera.</p>
+          <p>Wbudujesz w obudowę mały ekranik LCD? Panel wyświetli
+             na nim metryki jak deska rozdzielcza samochodu.</p>
         </article>
       </div>
 
@@ -71,6 +87,49 @@
         i chce mieć domowy serwer — bez spędzania wieczorów w terminalu.
         Wgrywasz, włączasz, wchodzisz przeglądarką. Tyle.
       </p>
+    </section>
+
+    <!-- ===== KATALOG APLIKACJI ===== -->
+    <section class="section" id="aplikacje" aria-labelledby="aplikacje-tytul">
+      <h2 class="section-label" id="aplikacje-tytul">Aplikacje z katalogu</h2>
+
+      <div class="features">
+        <article class="feature">
+          <h3>Jellyfin — własny Netflix</h3>
+          <p>Twoje filmy i seriale z dysku, ładnie poukładane,
+             do oglądania na telewizorze i telefonie.</p>
+        </article>
+
+        <article class="feature">
+          <h3>Nextcloud — własna chmura</h3>
+          <p>Pliki, zdjęcia i kalendarz jak w Dropboksie czy Dysku
+             Google — tylko że na Twoim sprzęcie.</p>
+        </article>
+
+        <article class="feature">
+          <h3>Pi-hole — koniec reklam</h3>
+          <p>Blokuje reklamy i śledzenie w całej domowej sieci,
+             na każdym urządzeniu naraz.</p>
+        </article>
+
+        <article class="feature">
+          <h3>Samba — dysk sieciowy</h3>
+          <p>Foldery serwera widoczne wprost w Windowsie i na Macu,
+             jak zwykły dysk.</p>
+        </article>
+
+        <article class="feature">
+          <h3>Uptime Kuma — stróż usług</h3>
+          <p>Pilnuje, czy Twoje strony i usługi żyją,
+             i alarmuje, gdy coś padnie.</p>
+        </article>
+
+        <article class="feature">
+          <h3>Kiwix — Wikipedia offline</h3>
+          <p>Cała Wikipedia (i nie tylko) na dysku —
+             działa nawet bez internetu.</p>
+        </article>
+      </div>
     </section>
 
     <!-- ===== JAK TO DZIAŁA ===== -->
@@ -104,27 +163,31 @@
 
       <div class="features">
         <article class="feature">
-          <h3>Jeden plik, zero instalacji</h3>
-          <p>Cały system to jedna mała binarka — pobierasz, uruchamiasz,
-             działa. Na procesorach Intel/AMD i ARM.</p>
+          <h3>Jeden plik zamiast instalatora</h3>
+          <p>Inne panele każą odpalać skrypty instalacyjne i stawiać
+             bazy danych. Tu pobierasz jeden plik, uruchamiasz — koniec.
+             Ta sama binarka na Intel/AMD i ARM.</p>
         </article>
 
         <article class="feature">
-          <h3>Działa bez internetu</h3>
-          <p>Panel, wykresy i czcionki są wbudowane w środek.
-             Serwer w piwnicy bez sieci? Żaden problem.</p>
+          <h3>Działa w 100% bez internetu</h3>
+          <p>Panel, wykresy, a nawet czcionki siedzą w środku binarki.
+             Serwer w piwnicy bez dostępu do sieci pokaże dokładnie
+             to samo, co podłączony do światłowodu.</p>
         </article>
 
         <article class="feature">
-          <h3>Lekki jak piórko</h3>
-          <p>Uciągnie go dziesięcioletni laptop i Raspberry Pi.
-             Zero ciężkich zależności, zero zbędnych usług.</p>
+          <h3>Lekki naprawdę, nie w reklamie</h3>
+          <p>Napisany w Go, bez ciężkich frameworków — panel zjada
+             megabajty RAM-u, nie gigabajty. Dziesięcioletni laptop
+             i Raspberry Pi wystarczą z zapasem.</p>
         </article>
 
         <article class="feature">
           <h3>Twoje dane zostają u Ciebie</h3>
-          <p>Open source na licencji AGPL-3.0. Bez chmury,
-             bez zakładania kont, bez telemetrii.</p>
+          <p>Zero chmury, zero zakładania kont, zero telemetrii —
+             nic nigdzie nie wycieka. Kod otwarty na licencji AGPL-3.0,
+             możesz sprawdzić każdą linijkę.</p>
         </article>
       </div>
     </section>
