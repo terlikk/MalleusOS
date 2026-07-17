@@ -14,148 +14,99 @@
        Czysto dekoracyjne, więc aria-hidden. -->
   <canvas id="bg-wave" class="bg-wave" aria-hidden="true"></canvas>
 
-  <!-- Hamburger — widoczny tylko na telefonie, rozwija pasek boczny -->
-  <button class="menu-toggle" id="menu-toggle" type="button"
-          aria-expanded="false" aria-controls="sidebar"
-          aria-label="Otwórz menu">
-    <span class="menu-icon" aria-hidden="true"></span>
-  </button>
+  <!-- ===== Górna belka ===== -->
+  <nav class="nav" aria-label="Nawigacja główna">
+    <span class="nav-brand">MalleusOS</span>
+    <a class="nav-link" href="https://github.com/terlikk/MalleusOS" rel="noopener">GitHub</a>
+  </nav>
 
-  <!-- ===== PASEK BOCZNY ===== -->
-  <aside class="sidebar" id="sidebar">
-    <a class="sidebar-brand" href="#start">MalleusOS</a>
-
-    <nav class="sidebar-nav" aria-label="Nawigacja główna">
-      <a href="#start">Start</a>
-      <a href="#funkcje">Co to robi</a>
-      <a href="#dla-kogo">Dla kogo</a>
-      <a href="#pobierz">Pobierz</a>
-      <a href="#szybki-start">Szybki start</a>
-    </nav>
-
-    <div class="sidebar-foot">
-      <a href="https://github.com/terlikk/MalleusOS" rel="noopener">GitHub</a>
-      <a href="https://www.gnu.org/licenses/agpl-3.0.html" rel="noopener">AGPL-3.0</a>
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <!-- &nbsp; to spacja niełamliwa: "Z" nie zostanie samo w linii -->
+    <h1 class="hero-title">Twój serwer.<br>Z&nbsp;przeglądarki.</h1>
+    <p class="hero-tagline">
+      Bootujesz z pendrive'a na dowolnym sprzęcie
+      i zarządzasz homelabem bez dotykania terminala.
+    </p>
+    <div class="hero-actions">
+      <a class="btn" href="#pobierz">Pobierz</a>
+      <a class="hero-link" href="#funkcje">Zobacz, co potrafi ↓</a>
     </div>
-  </aside>
+  </header>
 
-  <!-- ===== PODSTRONY (widoki przełączane bez przeładowania) ===== -->
-  <main class="content">
+  <main>
 
-    <!-- START -->
-    <section class="view view-hero" id="start" aria-label="Start">
-      <!-- &nbsp; to spacja niełamliwa: "Z" nie zostanie samo w linii -->
-      <h1 class="hero-title">Twój serwer.<br>Z&nbsp;przeglądarki.</h1>
-      <p class="hero-tagline">
-        Bootujesz z pendrive'a na dowolnym sprzęcie
-        i zarządzasz homelabem bez dotykania terminala.
-      </p>
-      <div class="hero-actions">
-        <a class="btn" href="#pobierz">Pobierz</a>
-        <a class="hero-link" href="#szybki-start">Szybki start</a>
-      </div>
-    </section>
-
-    <!-- CO TO ROBI -->
-    <section class="view" id="funkcje" aria-labelledby="funkcje-tytul">
+    <!-- ===== CO TO ROBI ===== -->
+    <section class="section" id="funkcje" aria-labelledby="funkcje-tytul">
       <h2 class="section-label" id="funkcje-tytul">Co to robi</h2>
 
       <div class="features">
         <article class="feature">
           <h3>Metryki na żywo</h3>
-          <p>CPU, RAM, dyski, sieć i temperatury odświeżane co sekundę —
+          <p>CPU, RAM, dyski, sieć i temperatury — co sekundę,
              prosto z <code>/proc</code> i <code>/sys</code>.</p>
         </article>
 
         <article class="feature">
           <h3>Kontenery jednym kliknięciem</h3>
-          <p>Start, stop, restart i logi na żywo dla kontenerów Dockera,
+          <p>Start, stop, restart i logi Dockera na żywo,
              bez wpisywania komend.</p>
         </article>
 
         <article class="feature">
           <h3>Katalog aplikacji</h3>
-          <p>Jellyfin, Nextcloud, Pi-hole, Samba i inne — instalacja jednym
-             kliknięciem, adresy <code>nazwa.malleus.local</code>.</p>
+          <p>Jellyfin, Nextcloud, Pi-hole i inne — instalacja
+             jednym kliknięciem.</p>
         </article>
 
         <article class="feature">
           <h3>Tryb kiosku</h3>
-          <p>Widok metryk dopasowany do małego panoramicznego ekranu LCD
+          <p>Widok metryk pod mały ekran LCD
              w obudowie serwera.</p>
         </article>
       </div>
-    </section>
 
-    <!-- DLA KOGO -->
-    <section class="view" id="dla-kogo" aria-labelledby="dla-kogo-tytul">
-      <h2 class="section-label" id="dla-kogo-tytul">Dla kogo</h2>
-
-      <div class="prose">
-        <p>
-          Masz starego laptopa, mini-PC albo Raspberry Pi i chcesz mieć w domu
-          własny serwer: filmy w Jellyfinie, pliki w Nextcloudzie, blokowanie
-          reklam Pi-hole'em. Ale nie chcesz spędzać wieczorów w terminalu na
-          konfigurowaniu systemu.
-        </p>
-        <p>
-          Z MalleusOS wgrywasz obraz na pendrive'a, wpinasz go w sprzęt
-          i włączasz zasilanie. Po chwili wchodzisz przeglądarką na adres
-          serwera i wszystko masz w jednym ciemnym panelu — jak deska
-          rozdzielcza, tylko dla Twojego homelabu.
-        </p>
-      </div>
-    </section>
-
-    <!-- POBIERZ -->
-    <section class="view" id="pobierz" aria-labelledby="pobierz-tytul">
-      <h2 class="section-label" id="pobierz-tytul">Pobierz</h2>
-
-      <p class="release-info" id="release-info" aria-live="polite">
-        Sprawdzam najnowsze wydanie…
+      <p class="who">
+        Dla każdego, kto ma starego laptopa, mini-PC albo Raspberry Pi
+        i chce mieć domowy serwer — bez spędzania wieczorów w terminalu.
+        Wgrywasz, włączasz, wchodzisz przeglądarką. Tyle.
       </p>
+    </section>
+
+    <!-- ===== POBIERZ I URUCHOM ===== -->
+    <section class="section" id="pobierz" aria-labelledby="pobierz-tytul">
+      <h2 class="section-label" id="pobierz-tytul">Pobierz i uruchom</h2>
 
       <div class="table-scroll">
         <table class="download-table">
-          <thead>
-            <tr>
-              <th scope="col">Wariant</th>
-              <th scope="col">Dla kogo</th>
-              <th scope="col">Plik</th>
-            </tr>
-          </thead>
           <tbody>
             <tr>
               <th scope="row">Linux amd64</th>
-              <td>PC, laptop, serwer (Intel/AMD)</td>
+              <td>PC, laptop, serwer</td>
               <td><a class="dl-link" id="dl-amd64"
                      href="https://github.com/terlikk/MalleusOS/releases"
                      rel="noopener">malleus-linux-amd64</a></td>
             </tr>
             <tr>
               <th scope="row">Linux arm64</th>
-              <td>Raspberry Pi 4/5 i inne płytki ARM</td>
+              <td>Raspberry Pi 4/5</td>
               <td><a class="dl-link" id="dl-arm64"
                      href="https://github.com/terlikk/MalleusOS/releases"
                      rel="noopener">malleus-linux-arm64</a></td>
             </tr>
             <tr>
               <th scope="row">Obraz .img</th>
-              <td>Bootowalny pendrive — cały system</td>
+              <td>Bootowalny pendrive</td>
               <td><span class="badge-soon">wkrótce</span></td>
             </tr>
           </tbody>
         </table>
       </div>
-    </section>
-
-    <!-- SZYBKI START -->
-    <section class="view" id="szybki-start" aria-labelledby="start-tytul">
-      <h2 class="section-label" id="start-tytul">Szybki start</h2>
-
-      <p class="prose-lead">
-        Trzy komendy na dowolnym Linuksie (amd64):
+      <p class="release-info" id="release-info" aria-live="polite">
+        Sprawdzam najnowsze wydanie…
       </p>
+
+      <p class="prose-lead">Albo trzy komendy w terminalu:</p>
 
       <div class="terminal">
         <pre><code id="quickstart-code">curl -LO https://github.com/terlikk/MalleusOS/releases/latest/download/malleus-linux-amd64
@@ -166,15 +117,24 @@ sudo ./malleus-linux-amd64</code></pre>
       </div>
 
       <p class="prose-note">
-        Potem otwierasz w przeglądarce <code>http://adres-serwera:8443</code>.
-        Na Raspberry Pi zamień <code>amd64</code> na <code>arm64</code>.
+        Potem otwierasz <code>http://adres-serwera:8443</code> i panel jest
+        Twój. Na Raspberry Pi zamień <code>amd64</code> na <code>arm64</code>.
       </p>
     </section>
 
   </main>
 
+  <!-- ===== STOPKA ===== -->
+  <footer class="footer">
+    <p>
+      MalleusOS — open source na licencji
+      <a href="https://www.gnu.org/licenses/agpl-3.0.html" rel="noopener">AGPL-3.0</a>
+      ·
+      <a href="https://github.com/terlikk/MalleusOS" rel="noopener">GitHub</a>
+    </p>
+  </footer>
+
   <script src="js/gradient-wave.js"></script>
-  <script src="js/router.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
