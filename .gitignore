@@ -1,0 +1,27 @@
+# --- Zależności JavaScript ---
+# node_modules/ to katalog, do którego npm pobiera biblioteki.
+# Nigdy go nie commitujemy — każdy odtworzy go sam przez `npm install`.
+node_modules/
+
+# --- Artefakty budowania ---
+# bin/ — skompilowane binarki Go (wynik `make build`), nie źródła.
+bin/
+# Katalogi z wynikiem budowania frontendu (Vite tworzy `dist/`).
+dist/
+
+# --- Dane działającej aplikacji ---
+# data/ — baza SQLite, historia metryk itp. Dane runtime, nie kod.
+data/
+*.db
+*.sqlite
+
+# --- Konfiguracja Vercela ---
+# .vercel/ zawiera lokalne powiązanie projektu z kontem Vercel
+# (identyfikatory projektu). Nie należy do repozytorium.
+.vercel/
+
+# --- Pliki systemowe i edytorowe ---
+.DS_Store
+Thumbs.db
+*.log
+*.swp
