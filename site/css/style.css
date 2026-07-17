@@ -1,0 +1,478 @@
+/* ============================================================
+   MalleusOS — style strony projektu
+   Estetyka: panel przyrządów / płyta racka 1U, ciemne granaty.
+   ============================================================ */
+
+/* ---------- Fonty lokalne (bez CDN) ----------
+   @font-face rejestruje font z pliku w repo. Podzbiór latin-ext
+   zawiera polskie znaki (ą, ę, ł…), latin — resztę alfabetu.
+   unicode-range mówi przeglądarce, kiedy który plik pobrać. */
+@font-face {
+  font-family: "Chakra Petch";
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/chakra-petch-latin-500-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF;
+}
+@font-face {
+  font-family: "Chakra Petch";
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/chakra-petch-latin-ext-500-normal.woff2") format("woff2");
+  unicode-range: U+0100-024F, U+1E00-1EFF;
+}
+@font-face {
+  font-family: "Chakra Petch";
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/chakra-petch-latin-700-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF;
+}
+@font-face {
+  font-family: "Chakra Petch";
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/chakra-petch-latin-ext-700-normal.woff2") format("woff2");
+  unicode-range: U+0100-024F, U+1E00-1EFF;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/jetbrains-mono-latin-ext-400-normal.woff2") format("woff2");
+  unicode-range: U+0100-024F, U+1E00-1EFF;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/jetbrains-mono-latin-700-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/jetbrains-mono-latin-ext-700-normal.woff2") format("woff2");
+  unicode-range: U+0100-024F, U+1E00-1EFF;
+}
+
+/* ---------- Zmienne projektu (design tokens) ----------
+   Custom properties: jedna definicja koloru, użycie wszędzie. */
+:root {
+  --bg: #0b1017;          /* tło strony — najgłębszy granat */
+  --panel: #111826;       /* panele/kafelki — warstwa wyżej */
+  --panel-edge: #1b2637;  /* krawędzie paneli */
+  --line: #233046;        /* linie, obramowania */
+  --text: #d7e0ec;        /* tekst podstawowy */
+  --text-dim: #8b99ad;    /* tekst drugorzędny */
+  --cyan: #53d6e8;        /* akcent: cyjan (stan OK, linki) */
+  --amber: #ffb454;       /* akcent: bursztyn (uwaga, hover) */
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+  --heading: "Chakra Petch", system-ui, sans-serif;
+}
+
+/* ---------- Reset i baza ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.6;
+  /* Delikatna siatka techniczna w tle — jak papier milimetrowy */
+  background-image:
+    linear-gradient(rgba(35, 48, 70, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(35, 48, 70, 0.18) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+h1, h2, h3 { font-family: var(--heading); }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.9em;
+  background: rgba(83, 214, 232, 0.08);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.1em 0.4em;
+  color: var(--cyan);
+}
+
+a { color: var(--cyan); }
+a:hover { color: var(--amber); }
+
+/* Wyraźna ramka fokusa dla nawigacji klawiaturą (dostępność).
+   :focus-visible działa tylko przy klawiaturze, nie przy kliknięciu. */
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---------- HERO: płyta racka 1U ---------- */
+.hero {
+  display: flex;
+  justify-content: center;
+  padding: clamp(2rem, 6vw, 5rem) 1rem;
+}
+
+.rack-plate {
+  position: relative;
+  width: min(920px, 100%);
+  background: linear-gradient(180deg, #141d2e 0%, var(--panel) 55%, #0d1420 100%);
+  border: 1px solid var(--panel-edge);
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    0 18px 50px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(215, 224, 236, 0.06);
+  padding: clamp(2.5rem, 7vw, 4.5rem) clamp(1.5rem, 6vw, 4rem);
+  text-align: center;
+}
+
+/* Śruby w rogach płyty — gradient imituje łeb śruby z nacięciem */
+.screw {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background:
+    linear-gradient(135deg, transparent 44%, #38465e 44%, #38465e 56%, transparent 56%),
+    radial-gradient(circle at 35% 30%, #4a5a75, #1a2334 70%);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.7), 0 1px 0 rgba(215,224,236,0.08);
+}
+.screw-tl { top: 12px; left: 12px; }
+.screw-tr { top: 12px; right: 12px; transform: rotate(70deg); }
+.screw-bl { bottom: 12px; left: 12px; transform: rotate(160deg); }
+.screw-br { bottom: 12px; right: 12px; transform: rotate(25deg); }
+
+/* Pasek stanu z diodą */
+.hero-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  color: var(--text-dim);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  margin-bottom: 1.8rem;
+  background: rgba(11, 16, 23, 0.6);
+}
+
+/* Dioda: pulsuje poświatą jak lampka zasilania */
+.led {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--cyan);
+  animation: led-pulse 2.2s ease-in-out infinite;
+}
+@keyframes led-pulse {
+  0%, 100% { box-shadow: 0 0 4px 1px rgba(83, 214, 232, 0.7); opacity: 1; }
+  50%      { box-shadow: 0 0 12px 4px rgba(83, 214, 232, 0.25); opacity: 0.55; }
+}
+
+.hero-title {
+  font-size: clamp(2.4rem, 9vw, 4.6rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--text);
+  text-shadow: 0 0 30px rgba(83, 214, 232, 0.25);
+}
+.hero-dot { color: var(--cyan); }
+
+.hero-tagline {
+  max-width: 34em;
+  margin: 1.2rem auto 2.2rem;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  color: var(--text-dim);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* ---------- Przyciski ---------- */
+.btn {
+  font-family: var(--heading);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.btn:hover { transform: translateY(-2px); }
+
+.btn-primary {
+  background: var(--cyan);
+  color: #06232a; /* ciemny tekst na cyjanie = mocny kontrast */
+  box-shadow: 0 0 18px rgba(83, 214, 232, 0.35);
+}
+.btn-primary:hover {
+  background: var(--amber);
+  color: #2a1a02;
+  box-shadow: 0 0 18px rgba(255, 180, 84, 0.35);
+}
+
+.btn-ghost {
+  color: var(--text);
+  border-color: var(--line);
+  background: rgba(17, 24, 38, 0.6);
+}
+.btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+
+/* ---------- Sekcje ---------- */
+.section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 3.5rem) 1rem;
+}
+
+.section-title {
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 1.6rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+}
+
+/* Numer sekcji jak oznaczenie na panelu przyrządów */
+.section-index {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--amber);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  background: var(--panel);
+}
+
+/* ---------- Panele i kafelki ---------- */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 10px;
+  padding: clamp(1.2rem, 4vw, 2rem);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.tiles {
+  display: grid;
+  /* auto-fit: kafelki same układają się od 1 kolumny (telefon)
+     do 2–4 kolumn (desktop), zależnie od szerokości */
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.tile {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 10px;
+  padding: 1.4rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.tile:hover {
+  border-color: var(--cyan);
+  transform: translateY(-3px);
+}
+
+.tile-icon {
+  font-size: 1.6rem;
+  color: var(--cyan);
+  margin-bottom: 0.6rem;
+}
+
+.tile h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.tile p {
+  font-size: 0.92rem;
+  color: var(--text-dim);
+}
+
+/* ---------- Teksty w panelach ---------- */
+.prose p + p { margin-top: 1rem; }
+.prose { color: var(--text-dim); }
+.prose-lead { margin-bottom: 1.2rem; color: var(--text-dim); }
+.prose-note { margin-top: 1.2rem; color: var(--text-dim); font-size: 0.95rem; }
+
+/* ---------- Tabela Pobierz ---------- */
+.release-info {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 1rem;
+}
+
+/* Szeroka tabela przewija się we własnym kontenerze,
+   żeby na telefonie nie rozpychała całej strony */
+.table-scroll { overflow-x: auto; }
+
+.download-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.download-table th,
+.download-table td {
+  text-align: left;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.download-table thead th {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+.download-table tbody th {
+  font-family: var(--heading);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.download-table td { color: var(--text-dim); }
+
+.dl-link { font-family: var(--mono); font-size: 0.88rem; }
+
+.badge-soon {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amber);
+  border: 1px dashed var(--amber);
+  border-radius: 4px;
+  padding: 0.2rem 0.6rem;
+  opacity: 0.85;
+}
+
+/* ---------- Blok terminala (Szybki start) ---------- */
+.terminal {
+  position: relative;
+  background: #0a0e15;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.9rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+
+.terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--line);
+}
+.terminal-dot:first-child { background: rgba(255, 180, 84, 0.7); }
+
+.terminal-title {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+}
+
+.terminal pre {
+  padding: 1.1rem 1.2rem;
+  overflow-x: auto; /* długie komendy przewijają się w bloku */
+}
+
+.terminal code {
+  /* wewnątrz terminala kod bez ramki i tła — samo pismo */
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text);
+  font-size: 0.88rem;
+  line-height: 1.8;
+}
+
+.btn-copy {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.7rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  background: rgba(83, 214, 232, 0.08);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.btn-copy:hover {
+  background: rgba(83, 214, 232, 0.2);
+}
+/* Stan "skopiowano" ustawiany z JS */
+.btn-copy.copied {
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
+/* ---------- Stopka ---------- */
+.footer {
+  border-top: 1px solid var(--line);
+  margin-top: 3rem;
+  padding: 2rem 1rem 2.5rem;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.footer-logo {
+  font-family: var(--heading);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text);
+}
+
+/* ---------- Dostępność: mniej ruchu ----------
+   Gdy użytkownik w systemie włączył "ogranicz animacje",
+   wyłączamy pulsowanie diody i podskoki przycisków. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  html { scroll-behavior: auto; }
+}
