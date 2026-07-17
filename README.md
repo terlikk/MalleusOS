@@ -24,6 +24,23 @@ i tryb kiosku na wbudowany ekranik LCD.
   kliknięciem, adresy w rodzaju `nazwa.malleus.local`.
 - **Tryb kiosku** — widok metryk pod mały panoramiczny ekran LCD.
 
+## Jak to działa
+
+1. **Wgrywasz i włączasz** — MalleusOS startuje z pendrive'a na dowolnym
+   sprzęcie; niczego nie instalujesz na dysku.
+2. **Serwer ogarnia się sam** — jeden mały program czyta metryki prosto
+   z systemu i rozmawia z Dockerem, bez dodatkowych agentów i konfiguracji.
+3. **Ty otwierasz przeglądarkę** — panel pokazuje wszystko na żywo,
+   a aplikacje instalujesz kliknięciem.
+
+## Czym się wyróżnia
+
+- **Jeden plik, zero instalacji** — cały system to jedna mała binarka
+  (Intel/AMD i ARM).
+- **Działa bez internetu** — panel, wykresy i czcionki są wbudowane w środek.
+- **Lekki** — uciągnie go dziesięcioletni laptop i Raspberry Pi.
+- **Twoje dane zostają u Ciebie** — bez chmury, kont i telemetrii.
+
 ## Szybki start
 
 ```bash

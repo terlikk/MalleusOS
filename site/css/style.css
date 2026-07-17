@@ -178,6 +178,44 @@ a:hover { color: var(--cyan); }
   color: var(--text-dim);
 }
 
+/* ---------- Jak to działa: trzy ponumerowane kroki ---------- */
+.steps {
+  list-style: none; /* wyłączamy domyślne numery — rysujemy własne */
+  counter-reset: krok; /* licznik CSS: sam numeruje kroki po kolei */
+  display: grid;
+  gap: 1.6rem;
+}
+
+.step {
+  counter-increment: krok;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 1.1rem;
+  align-items: baseline;
+}
+
+/* Numer kroku — duży, cyjanowy, w zwykłej czcionce */
+.step::before {
+  content: counter(krok);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cyan);
+  line-height: 1;
+}
+
+.step h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.3rem;
+}
+
+.step p {
+  grid-column: 2; /* opis pod tytułem, wyrównany do niego */
+  font-size: 0.95rem;
+  color: var(--text-dim);
+}
+
 /* Jedno zdanie "dla kogo" zamiast osobnej sekcji */
 .who {
   margin-top: 2.2rem;
