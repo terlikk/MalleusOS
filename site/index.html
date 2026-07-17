@@ -14,31 +14,23 @@
        Czysto dekoracyjne, więc aria-hidden. -->
   <canvas id="bg-wave" class="bg-wave" aria-hidden="true"></canvas>
 
-  <!-- ===== HERO: płyta czołowa racka 1U ===== -->
+  <!-- ===== Górna belka: sama marka i link ===== -->
+  <nav class="nav" aria-label="Nawigacja główna">
+    <span class="nav-brand">MalleusOS</span>
+    <a class="nav-link" href="https://github.com/terlikk/MalleusOS" rel="noopener">GitHub</a>
+  </nav>
+
+  <!-- ===== HERO: tylko tekst na falach ===== -->
   <header class="hero">
-    <div class="rack-plate">
-      <!-- Śruby w rogach płyty (czysto dekoracyjne, więc aria-hidden) -->
-      <span class="screw screw-tl" aria-hidden="true"></span>
-      <span class="screw screw-tr" aria-hidden="true"></span>
-      <span class="screw screw-bl" aria-hidden="true"></span>
-      <span class="screw screw-br" aria-hidden="true"></span>
-
-      <div class="hero-status" aria-hidden="true">
-        <span class="led"></span>
-        <span class="status-text">SYSTEM ONLINE</span>
-      </div>
-
-      <h1 class="hero-title">MALLEUS<span class="hero-dot">·</span>OS</h1>
-
-      <p class="hero-tagline">
-        Bootujesz z pendrive'a na dowolnym sprzęcie
-        i zarządzasz serwerem z przeglądarki.
-      </p>
-
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="#pobierz">Pobierz</a>
-        <a class="btn btn-ghost" href="https://github.com/terlikk/MalleusOS" rel="noopener">GitHub</a>
-      </div>
+    <!-- &nbsp; to spacja niełamliwa: "Z" nie zostanie samo w linii -->
+    <h1 class="hero-title">Twój serwer.<br>Z&nbsp;przeglądarki.</h1>
+    <p class="hero-tagline">
+      Bootujesz z pendrive'a na dowolnym sprzęcie
+      i zarządzasz homelabem bez dotykania terminala.
+    </p>
+    <div class="hero-actions">
+      <a class="btn" href="#pobierz">Pobierz</a>
+      <a class="hero-link" href="#szybki-start">Szybki start ↓</a>
     </div>
   </header>
 
@@ -46,44 +38,40 @@
 
     <!-- ===== CO TO ROBI ===== -->
     <section class="section" id="funkcje" aria-labelledby="funkcje-tytul">
-      <h2 class="section-title" id="funkcje-tytul"><span class="section-index">01</span> Co to robi</h2>
+      <h2 class="section-label" id="funkcje-tytul">Co to robi</h2>
 
-      <div class="tiles">
-        <article class="tile">
-          <div class="tile-icon" aria-hidden="true">▦</div>
+      <div class="features">
+        <article class="feature">
           <h3>Metryki na żywo</h3>
           <p>CPU, RAM, dyski, sieć i temperatury odświeżane co sekundę —
-             prosto z <code>/proc</code> i <code>/sys</code>, bez agentów-kolosów.</p>
+             prosto z <code>/proc</code> i <code>/sys</code>.</p>
         </article>
 
-        <article class="tile">
-          <div class="tile-icon" aria-hidden="true">▣</div>
+        <article class="feature">
           <h3>Kontenery jednym kliknięciem</h3>
-          <p>Start, stop, restart i logi na żywo dla kontenerów Dockera.
-             Bez wpisywania komend, prosto z panelu.</p>
+          <p>Start, stop, restart i logi na żywo dla kontenerów Dockera,
+             bez wpisywania komend.</p>
         </article>
 
-        <article class="tile">
-          <div class="tile-icon" aria-hidden="true">▤</div>
+        <article class="feature">
           <h3>Katalog aplikacji</h3>
           <p>Jellyfin, Nextcloud, Pi-hole, Samba i inne — instalacja jednym
-             kliknięciem, adresy w rodzaju <code>nazwa.malleus.local</code>.</p>
+             kliknięciem, adresy <code>nazwa.malleus.local</code>.</p>
         </article>
 
-        <article class="tile">
-          <div class="tile-icon" aria-hidden="true">▥</div>
+        <article class="feature">
           <h3>Tryb kiosku</h3>
           <p>Widok metryk dopasowany do małego panoramicznego ekranu LCD
-             wbudowanego w obudowę serwera.</p>
+             w obudowie serwera.</p>
         </article>
       </div>
     </section>
 
     <!-- ===== DLA KOGO ===== -->
     <section class="section" id="dla-kogo" aria-labelledby="dla-kogo-tytul">
-      <h2 class="section-title" id="dla-kogo-tytul"><span class="section-index">02</span> Dla kogo</h2>
+      <h2 class="section-label" id="dla-kogo-tytul">Dla kogo</h2>
 
-      <div class="panel prose">
+      <div class="prose">
         <p>
           Masz starego laptopa, mini-PC albo Raspberry Pi i chcesz mieć w domu
           własny serwer: filmy w Jellyfinie, pliki w Nextcloudzie, blokowanie
@@ -93,87 +81,74 @@
         <p>
           Z MalleusOS wgrywasz obraz na pendrive'a, wpinasz go w sprzęt
           i włączasz zasilanie. Po chwili wchodzisz przeglądarką na adres
-          serwera i wszystko — metryki, kontenery, instalacja aplikacji —
-          masz w jednym ciemnym panelu. Jak deska rozdzielcza, tylko dla
-          Twojego homelabu.
+          serwera i wszystko masz w jednym ciemnym panelu — jak deska
+          rozdzielcza, tylko dla Twojego homelabu.
         </p>
       </div>
     </section>
 
     <!-- ===== POBIERZ ===== -->
     <section class="section" id="pobierz" aria-labelledby="pobierz-tytul">
-      <h2 class="section-title" id="pobierz-tytul"><span class="section-index">03</span> Pobierz</h2>
+      <h2 class="section-label" id="pobierz-tytul">Pobierz</h2>
 
-      <div class="panel">
-        <p class="release-info" id="release-info" aria-live="polite">
-          Sprawdzam najnowsze wydanie…
-        </p>
+      <p class="release-info" id="release-info" aria-live="polite">
+        Sprawdzam najnowsze wydanie…
+      </p>
 
-        <div class="table-scroll">
-          <table class="download-table">
-            <thead>
-              <tr>
-                <th scope="col">Wariant</th>
-                <th scope="col">Dla kogo</th>
-                <th scope="col">Plik</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">Linux amd64</th>
-                <td>PC, laptop, serwer (procesory Intel/AMD)</td>
-                <td><a class="dl-link" id="dl-amd64"
-                       href="https://github.com/terlikk/MalleusOS/releases"
-                       rel="noopener">malleus-linux-amd64</a></td>
-              </tr>
-              <tr>
-                <th scope="row">Linux arm64</th>
-                <td>Raspberry Pi 4/5 i inne płytki ARM</td>
-                <td><a class="dl-link" id="dl-arm64"
-                       href="https://github.com/terlikk/MalleusOS/releases"
-                       rel="noopener">malleus-linux-arm64</a></td>
-              </tr>
-              <tr>
-                <th scope="row">Obraz .img</th>
-                <td>Bootowalny pendrive — cały system</td>
-                <td><span class="badge-soon">wkrótce</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="table-scroll">
+        <table class="download-table">
+          <thead>
+            <tr>
+              <th scope="col">Wariant</th>
+              <th scope="col">Dla kogo</th>
+              <th scope="col">Plik</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Linux amd64</th>
+              <td>PC, laptop, serwer (Intel/AMD)</td>
+              <td><a class="dl-link" id="dl-amd64"
+                     href="https://github.com/terlikk/MalleusOS/releases"
+                     rel="noopener">malleus-linux-amd64</a></td>
+            </tr>
+            <tr>
+              <th scope="row">Linux arm64</th>
+              <td>Raspberry Pi 4/5 i inne płytki ARM</td>
+              <td><a class="dl-link" id="dl-arm64"
+                     href="https://github.com/terlikk/MalleusOS/releases"
+                     rel="noopener">malleus-linux-arm64</a></td>
+            </tr>
+            <tr>
+              <th scope="row">Obraz .img</th>
+              <td>Bootowalny pendrive — cały system</td>
+              <td><span class="badge-soon">wkrótce</span></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
     <!-- ===== SZYBKI START ===== -->
     <section class="section" id="szybki-start" aria-labelledby="start-tytul">
-      <h2 class="section-title" id="start-tytul"><span class="section-index">04</span> Szybki start</h2>
+      <h2 class="section-label" id="start-tytul">Szybki start</h2>
 
-      <div class="panel">
-        <p class="prose-lead">
-          Trzy komendy w terminalu na dowolnym Linuksie (amd64) —
-          pobierasz binarkę, nadajesz prawo uruchamiania i startujesz:
-        </p>
+      <p class="prose-lead">
+        Trzy komendy na dowolnym Linuksie (amd64):
+      </p>
 
-        <div class="terminal">
-          <div class="terminal-bar" aria-hidden="true">
-            <span class="terminal-dot"></span>
-            <span class="terminal-dot"></span>
-            <span class="terminal-dot"></span>
-            <span class="terminal-title">bash</span>
-          </div>
-          <pre><code id="quickstart-code">curl -LO https://github.com/terlikk/MalleusOS/releases/latest/download/malleus-linux-amd64
+      <div class="terminal">
+        <pre><code id="quickstart-code">curl -LO https://github.com/terlikk/MalleusOS/releases/latest/download/malleus-linux-amd64
 chmod +x malleus-linux-amd64
 sudo ./malleus-linux-amd64</code></pre>
-          <button class="btn-copy" id="btn-copy" type="button"
-                  aria-label="Skopiuj komendy do schowka">kopiuj</button>
-        </div>
-
-        <p class="prose-note">
-          Potem otwierasz w przeglądarce <code>http://adres-serwera:8443</code>
-          i panel jest Twój. Na Raspberry Pi zamień <code>amd64</code>
-          na <code>arm64</code>.
-        </p>
+        <button class="btn-copy" id="btn-copy" type="button"
+                aria-label="Skopiuj komendy do schowka">kopiuj</button>
       </div>
+
+      <p class="prose-note">
+        Potem otwierasz w przeglądarce <code>http://adres-serwera:8443</code>.
+        Na Raspberry Pi zamień <code>amd64</code> na <code>arm64</code>.
+      </p>
     </section>
 
   </main>
@@ -181,11 +156,10 @@ sudo ./malleus-linux-amd64</code></pre>
   <!-- ===== STOPKA ===== -->
   <footer class="footer">
     <p>
-      <span class="footer-logo">MALLEUS·OS</span>
-      — open source na licencji
+      MalleusOS — open source na licencji
       <a href="https://www.gnu.org/licenses/agpl-3.0.html" rel="noopener">AGPL-3.0</a>
       ·
-      <a href="https://github.com/terlikk/MalleusOS" rel="noopener">kod źródłowy na GitHubie</a>
+      <a href="https://github.com/terlikk/MalleusOS" rel="noopener">GitHub</a>
     </p>
   </footer>
 
