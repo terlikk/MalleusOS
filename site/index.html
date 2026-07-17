@@ -14,30 +14,50 @@
        Czysto dekoracyjne, więc aria-hidden. -->
   <canvas id="bg-wave" class="bg-wave" aria-hidden="true"></canvas>
 
-  <!-- ===== Górna belka: sama marka i link ===== -->
-  <nav class="nav" aria-label="Nawigacja główna">
-    <span class="nav-brand">MalleusOS</span>
-    <a class="nav-link" href="https://github.com/terlikk/MalleusOS" rel="noopener">GitHub</a>
-  </nav>
+  <!-- Hamburger — widoczny tylko na telefonie, rozwija pasek boczny -->
+  <button class="menu-toggle" id="menu-toggle" type="button"
+          aria-expanded="false" aria-controls="sidebar"
+          aria-label="Otwórz menu">
+    <span class="menu-icon" aria-hidden="true"></span>
+  </button>
 
-  <!-- ===== HERO: tylko tekst na falach ===== -->
-  <header class="hero">
-    <!-- &nbsp; to spacja niełamliwa: "Z" nie zostanie samo w linii -->
-    <h1 class="hero-title">Twój serwer.<br>Z&nbsp;przeglądarki.</h1>
-    <p class="hero-tagline">
-      Bootujesz z pendrive'a na dowolnym sprzęcie
-      i zarządzasz homelabem bez dotykania terminala.
-    </p>
-    <div class="hero-actions">
-      <a class="btn" href="#pobierz">Pobierz</a>
-      <a class="hero-link" href="#szybki-start">Szybki start ↓</a>
+  <!-- ===== PASEK BOCZNY ===== -->
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-brand" href="#start">MalleusOS</a>
+
+    <nav class="sidebar-nav" aria-label="Nawigacja główna">
+      <a href="#start">Start</a>
+      <a href="#funkcje">Co to robi</a>
+      <a href="#dla-kogo">Dla kogo</a>
+      <a href="#pobierz">Pobierz</a>
+      <a href="#szybki-start">Szybki start</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <a href="https://github.com/terlikk/MalleusOS" rel="noopener">GitHub</a>
+      <a href="https://www.gnu.org/licenses/agpl-3.0.html" rel="noopener">AGPL-3.0</a>
     </div>
-  </header>
+  </aside>
 
-  <main>
+  <!-- ===== PODSTRONY (widoki przełączane bez przeładowania) ===== -->
+  <main class="content">
 
-    <!-- ===== CO TO ROBI ===== -->
-    <section class="section" id="funkcje" aria-labelledby="funkcje-tytul">
+    <!-- START -->
+    <section class="view view-hero" id="start" aria-label="Start">
+      <!-- &nbsp; to spacja niełamliwa: "Z" nie zostanie samo w linii -->
+      <h1 class="hero-title">Twój serwer.<br>Z&nbsp;przeglądarki.</h1>
+      <p class="hero-tagline">
+        Bootujesz z pendrive'a na dowolnym sprzęcie
+        i zarządzasz homelabem bez dotykania terminala.
+      </p>
+      <div class="hero-actions">
+        <a class="btn" href="#pobierz">Pobierz</a>
+        <a class="hero-link" href="#szybki-start">Szybki start</a>
+      </div>
+    </section>
+
+    <!-- CO TO ROBI -->
+    <section class="view" id="funkcje" aria-labelledby="funkcje-tytul">
       <h2 class="section-label" id="funkcje-tytul">Co to robi</h2>
 
       <div class="features">
@@ -67,8 +87,8 @@
       </div>
     </section>
 
-    <!-- ===== DLA KOGO ===== -->
-    <section class="section" id="dla-kogo" aria-labelledby="dla-kogo-tytul">
+    <!-- DLA KOGO -->
+    <section class="view" id="dla-kogo" aria-labelledby="dla-kogo-tytul">
       <h2 class="section-label" id="dla-kogo-tytul">Dla kogo</h2>
 
       <div class="prose">
@@ -87,8 +107,8 @@
       </div>
     </section>
 
-    <!-- ===== POBIERZ ===== -->
-    <section class="section" id="pobierz" aria-labelledby="pobierz-tytul">
+    <!-- POBIERZ -->
+    <section class="view" id="pobierz" aria-labelledby="pobierz-tytul">
       <h2 class="section-label" id="pobierz-tytul">Pobierz</h2>
 
       <p class="release-info" id="release-info" aria-live="polite">
@@ -129,8 +149,8 @@
       </div>
     </section>
 
-    <!-- ===== SZYBKI START ===== -->
-    <section class="section" id="szybki-start" aria-labelledby="start-tytul">
+    <!-- SZYBKI START -->
+    <section class="view" id="szybki-start" aria-labelledby="start-tytul">
       <h2 class="section-label" id="start-tytul">Szybki start</h2>
 
       <p class="prose-lead">
@@ -153,17 +173,8 @@ sudo ./malleus-linux-amd64</code></pre>
 
   </main>
 
-  <!-- ===== STOPKA ===== -->
-  <footer class="footer">
-    <p>
-      MalleusOS — open source na licencji
-      <a href="https://www.gnu.org/licenses/agpl-3.0.html" rel="noopener">AGPL-3.0</a>
-      ·
-      <a href="https://github.com/terlikk/MalleusOS" rel="noopener">GitHub</a>
-    </p>
-  </footer>
-
   <script src="js/gradient-wave.js"></script>
+  <script src="js/router.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
