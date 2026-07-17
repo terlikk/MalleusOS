@@ -403,6 +403,10 @@ a:hover { color: var(--amber); }
 
 .terminal-title {
   margin-left: auto;
+  /* Prawy margines robi miejsce na przycisk "kopiuj", który jest
+     pozycjonowany absolutnie w tym samym rogu (także w szerszym
+     stanie "skopiowano ✓") */
+  margin-right: 8rem;
   font-family: var(--mono);
   font-size: 0.7rem;
   letter-spacing: 0.2em;
