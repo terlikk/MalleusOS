@@ -14,12 +14,12 @@ import (
 // Server spina kolektor metryk i historię z routingiem HTTP.
 type Server struct {
 	col     *agent.Collector
-	hist    *agent.History
+	hist    agent.Store
 	version string
 	mux     *http.ServeMux
 }
 
-func New(col *agent.Collector, hist *agent.History, version string) *Server {
+func New(col *agent.Collector, hist agent.Store, version string) *Server {
 	s := &Server{col: col, hist: hist, version: version, mux: http.NewServeMux()}
 
 	// Wzorzec "GET /ścieżka" (Go 1.22+) ogranicza trasę do jednej

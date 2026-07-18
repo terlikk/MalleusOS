@@ -5,6 +5,14 @@ import (
 	"time"
 )
 
+// Store to wspólny interfejs magazynu próbek. Spełniają go
+// History (bufor w pamięci) i storage.DB (SQLite) — dzięki temu
+// kolektor i serwer nie muszą wiedzieć, gdzie lądują dane.
+type Store interface {
+	Add(Sample)
+	Since(d time.Duration, maxPoints int) []Sample
+}
+
 // History to bufor cykliczny (ring buffer) na próbki.
 //
 // Bufor cykliczny ma stałą pojemność: gdy się zapełni, najnowsza
@@ -62,15 +70,20 @@ func (h *History) Since(d time.Duration, maxPoints int) []Sample {
 	for start < len(ordered) && ordered[start].Time < cutoff {
 		start++
 	}
-	out := ordered[start:]
+	return Downsample(ordered[start:], maxPoints)
+}
 
-	if maxPoints > 0 && len(out) > maxPoints {
-		stride := (len(out) + maxPoints - 1) / maxPoints
-		thinned := make([]Sample, 0, maxPoints)
-		for i := 0; i < len(out); i += stride {
-			thinned = append(thinned, out[i])
-		}
-		out = thinned
+// Downsample przerzedza listę próbek do co najwyżej maxPoints,
+// biorąc co n-tą — wykres i tak nie pokaże więcej punktów,
+// niż ma pikseli szerokości.
+func Downsample(in []Sample, maxPoints int) []Sample {
+	if maxPoints <= 0 || len(in) <= maxPoints {
+		return in
+	}
+	stride := (len(in) + maxPoints - 1) / maxPoints
+	out := make([]Sample, 0, maxPoints)
+	for i := 0; i < len(in); i += stride {
+		out = append(out, in[i])
 	}
 	return out
 }

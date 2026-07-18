@@ -41,9 +41,10 @@ func (c *Collector) Latest() Sample {
 	return c.latest
 }
 
-// Run zbiera próbkę co `every` i dopisuje ją do historii.
-// Uruchamiaj w osobnej goroutine: go kolektor.Run(historia, time.Second)
-func (c *Collector) Run(hist *History, every time.Duration) {
+// Run zbiera próbkę co `every` i dopisuje ją do magazynu
+// (pamięć albo SQLite — cokolwiek spełnia interfejs Store).
+// Uruchamiaj w osobnej goroutine: go kolektor.Run(magazyn, time.Second)
+func (c *Collector) Run(hist Store, every time.Duration) {
 	ticker := time.NewTicker(every)
 	defer ticker.Stop()
 
