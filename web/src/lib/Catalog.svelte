@@ -52,10 +52,16 @@
     }
   }
 
-  // Adres aplikacji: ten sam host co panel, inny port.
-  // Docelowo zastąpią to adresy typu filmy.malleus.local (Caddy).
+  // Adres aplikacji. Jeśli panel otwarto przez malleus.local,
+  // linkujemy do ładnej subdomeny (filmy.malleus.local — reverse
+  // proxy w binarce). W innym razie (wejście po IP) — port wprost,
+  // bo skoro mDNS nie zadziałał dla panelu, dla apki też może nie.
   function urlFor(app) {
-    return `http://${window.location.hostname}:${app.webPort}`;
+    const host = window.location.hostname;
+    if (host.endsWith("malleus.local") && app.subdomain) {
+      return `http://${app.subdomain}.malleus.local`;
+    }
+    return `http://${host}:${app.webPort}`;
   }
 </script>
 
@@ -76,6 +82,9 @@
         <div class="info">
           <b>{app.name}</b>
           <span>{app.tagline}</span>
+          {#if app.installed && app.subdomain && app.webPort > 0}
+            <span class="addr mono">{app.subdomain}.malleus.local</span>
+          {/if}
           {#if errors[app.id]}
             <span class="error">{errors[app.id]}</span>
           {/if}
@@ -137,6 +146,7 @@
   .info b { font-size: 0.9rem; white-space: nowrap; }
   .info span { font-size: 0.76rem; color: var(--dim); }
   .info .error { color: var(--red); }
+  .info .addr { font-size: 0.72rem; color: var(--cyan); opacity: 0.85; }
 
   .act { margin-left: auto; flex: none; display: flex; gap: 0.4rem; align-items: center; }
 

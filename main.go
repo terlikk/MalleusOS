@@ -7,11 +7,13 @@ import (
 	"flag"
 	"io/fs"
 	"log"
+	"net/http"
 	"path/filepath"
 	"time"
 
 	"malleus/agent"
 	"malleus/docker"
+	"malleus/mdns"
 	"malleus/server"
 	"malleus/storage"
 	"malleus/web"
@@ -27,6 +29,8 @@ func main() {
 	interval := flag.Duration("interval", time.Second, "co ile zbierać próbkę metryk")
 	dataDir := flag.String("data", "data", "katalog na bazę danych")
 	dockerSock := flag.String("docker-sock", "/var/run/docker.sock", "socket Dockera (albo atrapy fakedocker)")
+	proxyAddr := flag.String("proxy", ":80", "adres reverse proxy dla adresów .malleus.local (puste = wyłącz)")
+	mdnsOn := flag.Bool("mdns", true, "rozgłaszaj nazwy .malleus.local w sieci lokalnej (mDNS)")
 	flag.Parse()
 
 	kolektor := agent.NewCollector()
@@ -68,6 +72,29 @@ func main() {
 		Docker:  docker.New(*dockerSock),
 		Auth:    auth,
 	})
+
+	// Ładne adresy: reverse proxy na :80 (filmy.malleus.local →
+	// aplikacja) + responder mDNS. Awaria żadnego z nich nie
+	// zatrzymuje panelu — logujemy i działamy dalej.
+	if *proxyAddr != "" {
+		go func() {
+			p := &http.Server{
+				Addr:              *proxyAddr,
+				Handler:           srv.ProxyHandler(),
+				ReadHeaderTimeout: 5 * time.Second,
+			}
+			if err := p.ListenAndServe(); err != nil {
+				log.Printf("proxy %s: %v — adresy .malleus.local nie będą działać (port 80 wymaga roota)", *proxyAddr, err)
+			}
+		}()
+	}
+	if *mdnsOn {
+		go func() {
+			if err := mdns.Serve(); err != nil {
+				log.Printf("mdns: %v — nazwy .malleus.local nie będą rozgłaszane", err)
+			}
+		}()
+	}
 	log.Printf("malleus %s — panel pod http://localhost%s", version, *addr)
 	if err := srv.ListenAndServe(*addr); err != nil {
 		log.Fatal(err)

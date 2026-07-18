@@ -97,6 +97,12 @@ Do pracy nad samym panelem: `cd web && npm run dev` (Vite serwuje
 panel z podmianą na żywo, a zapytania `/api` przekazuje do
 działającej binarki).
 
+Ładne adresy (`filmy.malleus.local` itd.): binarka ma w środku
+reverse proxy na porcie 80 i responder mDNS — na prawdziwym
+serwerze uruchom przez `sudo` (port 80), a nazwy w sieci lokalnej
+rozgłoszą się same. Sterowanie flagami: `-proxy ""` wyłącza proxy,
+`-mdns=false` wyłącza rozgłaszanie.
+
 Development bez Dockera — atrapa udająca jego API:
 
 ```bash
