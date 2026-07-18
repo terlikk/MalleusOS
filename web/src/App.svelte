@@ -8,6 +8,8 @@
   import Temps from "./lib/Temps.svelte";
   import Containers from "./lib/Containers.svelte";
   import Catalog from "./lib/Catalog.svelte";
+  import Projects from "./lib/Projects.svelte";
+  import Kiosk from "./lib/Kiosk.svelte";
   import Login from "./lib/Login.svelte";
   import { getJSON, streamMetrics } from "./lib/api.js";
   import { bytes, bps, rdzenie } from "./lib/format.js";
@@ -63,6 +65,11 @@
   );
 
   const GB = 1024 * 1024; // kB → GB (pamięć raportujemy w kB)
+
+  // Tryb kiosku: pełnoekranowe metryki pod mały ekranik LCD.
+  // Serwer serwuje index.html także pod /kiosk, a my tu wybieramy
+  // widok po ścieżce.
+  const kiosk = window.location.pathname === "/kiosk";
 </script>
 
 {#if auth == null}
@@ -71,6 +78,8 @@
   <Login setup onSuccess={checkAuth} />
 {:else if !auth.authenticated}
   <Login onSuccess={checkAuth} />
+{:else if kiosk}
+  <Kiosk {sample} {system} {online} />
 {:else}
 <div class="layout">
   <Header {system} {online} />
@@ -138,6 +147,10 @@
 
   <div class="containers">
     <Catalog />
+  </div>
+
+  <div class="containers">
+    <Projects />
   </div>
 
   <div class="grid-bottom">

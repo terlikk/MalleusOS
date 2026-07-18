@@ -97,6 +97,9 @@ Do pracy nad samym panelem: `cd web && npm run dev` (Vite serwuje
 panel z podmianą na żywo, a zapytania `/api` przekazuje do
 działającej binarki).
 
+Tryb kiosku (wielkie metryki pod ekranik LCD): otwórz
+`http://adres-serwera:8443/kiosk`.
+
 Ładne adresy (`filmy.malleus.local` itd.): binarka ma w środku
 reverse proxy na porcie 80 i responder mDNS — na prawdziwym
 serwerze uruchom przez `sudo` (port 80), a nazwy w sieci lokalnej
