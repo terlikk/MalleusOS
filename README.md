@@ -9,7 +9,7 @@ dostajesz ciemny panel w przeglądarce: metryki na żywo, kontenery Dockera
 jednym kliknięciem, katalog aplikacji (Jellyfin, Nextcloud, Pi-hole…)
 i tryb kiosku na wbudowany ekranik LCD.
 
-🌐 **Strona projektu:** https://malleusos.vercel.app
+🌐 **Strona projektu:** https://malleus-os.vercel.app
 
 ![Zrzut ekranu panelu MalleusOS — wkrótce](docs/screenshot-placeholder.png)
 *(screenshot panelu pojawi się wraz z pierwszym wydaniem)*
