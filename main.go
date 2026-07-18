@@ -5,6 +5,7 @@ package main
 
 import (
 	"flag"
+	"io/fs"
 	"log"
 	"path/filepath"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"malleus/agent"
 	"malleus/server"
 	"malleus/storage"
+	"malleus/web"
 )
 
 // Wersja wpisana na sztywno; przy wydaniach będzie podmieniana.
@@ -44,8 +46,15 @@ func main() {
 	// serwer HTTP działa równolegle i tylko czyta wyniki.
 	go kolektor.Run(magazyn, *interval)
 
-	srv := server.New(kolektor, magazyn, version)
-	log.Printf("malleus %s — API pod http://localhost%s/api/v1/", version, *addr)
+	// Panel WWW wkompilowany w binarkę; fs.Sub "wchodzi" do dist/,
+	// żeby index.html był w korzeniu serwowanych plików.
+	panel, err := fs.Sub(web.Dist, "dist")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	srv := server.New(kolektor, magazyn, version, panel)
+	log.Printf("malleus %s — panel pod http://localhost%s", version, *addr)
 	if err := srv.ListenAndServe(*addr); err != nil {
 		log.Fatal(err)
 	}

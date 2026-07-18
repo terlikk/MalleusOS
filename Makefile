@@ -30,4 +30,9 @@ vet:
 run: build
 	./bin/malleus
 
-.PHONY: build build-all vet run
+.PHONY: build build-all vet run web
+
+# Zbuduj panel WWW (wynik: web/dist — wkompilowywany w binarkę).
+# Pełna binarka z panelem: make web && make build
+web:
+	cd web && npm install && npm run build

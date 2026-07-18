@@ -5,7 +5,10 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"net/http"
+	"path"
+	"strings"
 	"time"
 
 	"malleus/agent"
@@ -16,11 +19,12 @@ type Server struct {
 	col     *agent.Collector
 	hist    agent.Store
 	version string
+	assets  fs.FS // zbudowany panel WWW (wkompilowany przez embed)
 	mux     *http.ServeMux
 }
 
-func New(col *agent.Collector, hist agent.Store, version string) *Server {
-	s := &Server{col: col, hist: hist, version: version, mux: http.NewServeMux()}
+func New(col *agent.Collector, hist agent.Store, version string, assets fs.FS) *Server {
+	s := &Server{col: col, hist: hist, version: version, assets: assets, mux: http.NewServeMux()}
 
 	// Wzorzec "GET /ścieżka" (Go 1.22+) ogranicza trasę do jednej
 	// metody HTTP — inne dostaną automatycznie 405.
@@ -52,12 +56,28 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 	_ = json.NewEncoder(w).Encode(v)
 }
 
+// handleRoot serwuje pliki panelu z pamięci binarki.
+// Ścieżki bez rozszerzenia (przyszłe podstrony) dostają index.html —
+// klasyczne zachowanie dla aplikacji jednostronicowych.
 func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+	p := strings.TrimPrefix(path.Clean(r.URL.Path), "/")
+	if p == "" {
+		p = "index.html"
+	}
+	if _, err := fs.Stat(s.assets, p); err != nil {
+		if strings.Contains(path.Base(p), ".") {
+			http.NotFound(w, r)
+			return
+		}
+		p = "index.html"
+	}
+	if _, err := fs.Stat(s.assets, p); err != nil {
+		// Panel niezbudowany (świeży klon bez `make web`) —
+		// API działa, więc mówimy o tym wprost zamiast rzucać 404.
+		fmt.Fprintf(w, "MalleusOS %s — API pod /api/v1/ (panel: uruchom `make web` i przebuduj)\n", s.version)
 		return
 	}
-	fmt.Fprintf(w, "MalleusOS %s — API pod /api/v1/, panel WWW w budowie\n", s.version)
+	http.ServeFileFS(w, r, s.assets, p)
 }
 
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
