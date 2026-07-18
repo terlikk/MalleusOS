@@ -107,7 +107,7 @@
   .led {
     width: 8px; height: 8px; border-radius: 50%;
     background: var(--cyan);
-    box-shadow: 0 0 8px 2px rgba(83, 214, 232, 0.5);
+    box-shadow: 0 0 8px 2px rgba(167, 139, 250, 0.5);
   }
 
   h1 { font-size: 1.25rem; letter-spacing: -0.01em; }
@@ -123,7 +123,7 @@
   input {
     font: inherit;
     color: var(--text);
-    background: rgba(11, 16, 23, 0.6);
+    background: rgba(13, 11, 26, 0.6);
     border: 1px solid var(--edge);
     border-radius: 8px;
     padding: 0.6rem 0.8rem;
@@ -135,7 +135,7 @@
   button {
     font: inherit;
     font-weight: 650;
-    color: #06232a;
+    color: #1d1533;
     background: var(--cyan);
     border: none;
     border-radius: 999px;

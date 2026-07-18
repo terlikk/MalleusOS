@@ -574,7 +574,7 @@
   // ---------- Start: podpinamy tło pod stronę ----------
   // Paleta MalleusOS: baza = tło strony, potem coraz jaśniejsze
   // granaty aż po stłumiony cyjan. Maks. 4 kolory (patrz wyżej).
-  const KOLORY = ["#0b1017", "#101d31", "#0e2f40", "#155263"];
+  const KOLORY = ["#0d0b1a", "#1a1440", "#2b1e5e", "#45318a"];
 
   const canvas = document.getElementById("bg-wave");
   if (!canvas) return;

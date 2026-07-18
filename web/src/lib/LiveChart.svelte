@@ -90,13 +90,13 @@
       },
       axes: [
         {
-          stroke: "#8fa0b6",
+          stroke: "#9d95b8",
           grid: { show: false },
           ticks: { show: false },
           font: "11px system-ui",
         },
         {
-          stroke: "#8fa0b6",
+          stroke: "#9d95b8",
           grid: { stroke: "rgba(238,242,247,0.06)", width: 1 },
           ticks: { show: false },
           font: "11px system-ui",
@@ -164,7 +164,7 @@
     cursor: pointer;
   }
   .ranges button.on {
-    color: #06232a;
+    color: #1d1533;
     background: var(--cyan);
     font-weight: 600;
   }

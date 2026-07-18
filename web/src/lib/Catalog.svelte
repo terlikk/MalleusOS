@@ -112,7 +112,7 @@
     display: flex;
     align-items: center;
     gap: 0.9rem;
-    background: rgba(11, 16, 23, 0.45);
+    background: rgba(13, 11, 26, 0.45);
     border: 1px solid var(--edge);
     border-radius: 14px;
     padding: 0.9rem 1rem;
@@ -128,9 +128,9 @@
     justify-content: center;
     font-size: 1.15rem;
     font-weight: 700;
-    background: rgba(83, 214, 232, 0.1);
+    background: rgba(167, 139, 250, 0.1);
     color: var(--cyan);
-    border: 1px solid rgba(83, 214, 232, 0.22);
+    border: 1px solid rgba(167, 139, 250, 0.22);
   }
 
   .info { min-width: 0; flex: 1; line-height: 1.35; display: flex; flex-direction: column; }
@@ -144,7 +144,7 @@
     font: inherit;
     font-size: 0.8rem;
     font-weight: 650;
-    color: #06232a;
+    color: #1d1533;
     background: var(--cyan);
     border: none;
     border-radius: 999px;
@@ -158,7 +158,7 @@
     font-weight: 600;
     color: var(--cyan);
     text-decoration: none;
-    border: 1px solid rgba(83, 214, 232, 0.35);
+    border: 1px solid rgba(167, 139, 250, 0.35);
     border-radius: 999px;
     padding: 0.4rem 1.05rem;
   }

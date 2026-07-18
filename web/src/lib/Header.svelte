@@ -33,13 +33,13 @@
     height: 9px;
     border-radius: 50%;
     background: var(--cyan);
-    box-shadow: 0 0 10px 2px rgba(83, 214, 232, 0.55);
+    box-shadow: 0 0 10px 2px rgba(167, 139, 250, 0.55);
     animation: pulse 2.2s ease-in-out infinite;
   }
   /* Brak połączenia: dioda gaśnie na bursztynowo i nie pulsuje */
   .led.off {
     background: var(--amber);
-    box-shadow: 0 0 8px 2px rgba(255, 180, 84, 0.4);
+    box-shadow: 0 0 8px 2px rgba(251, 191, 36, 0.4);
     animation: none;
   }
   @keyframes pulse {

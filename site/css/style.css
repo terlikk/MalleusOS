@@ -24,10 +24,10 @@
 
 /* ---------- Zmienne projektu ---------- */
 :root {
-  --bg: #0b1017;         /* tło strony — najgłębszy granat */
+  --bg: #0d0b1a;         /* tło strony — najgłębszy granat */
   --text: #eef2f7;       /* tekst podstawowy — prawie biel */
-  --text-dim: #93a1b5;   /* tekst drugorzędny */
-  --cyan: #53d6e8;       /* akcent — używany oszczędnie */
+  --text-dim: #9d95b8;   /* tekst drugorzędny */
+  --cyan: #a78bfa;       /* akcent — używany oszczędnie */
   --hairline: rgba(238, 242, 247, 0.1); /* cienkie linie */
   --mono: "JetBrains Mono", ui-monospace, monospace;
 }
@@ -126,7 +126,7 @@ a:hover { color: var(--cyan); }
 /* Jeden mocny przycisk — biały, pigułka */
 .btn {
   background: var(--text);
-  color: #0b1017;
+  color: #0d0b1a;
   font-weight: 600;
   font-size: 1rem;
   text-decoration: none;
@@ -134,7 +134,7 @@ a:hover { color: var(--cyan); }
   border-radius: 999px;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
-.btn:hover { transform: translateY(-1px); opacity: 0.9; color: #0b1017; }
+.btn:hover { transform: translateY(-1px); opacity: 0.9; color: #0d0b1a; }
 
 .hero-link {
   color: var(--text-dim);
@@ -267,7 +267,7 @@ a:hover { color: var(--cyan); }
 /* ---------- Blok komend ---------- */
 .terminal {
   position: relative;
-  background: rgba(7, 10, 16, 0.55);
+  background: rgba(10, 8, 20, 0.55);
   /* rozmycie tła za blokiem — szklany, premium efekt */
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);

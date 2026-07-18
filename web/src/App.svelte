@@ -111,22 +111,22 @@
       title="Procesor"
       percent
       format={(v) => `${Math.round(v)}%`}
-      series={[{ label: "CPU", color: "#53d6e8", get: (s) => s.cpu.usagePercent, fill: true }]}
+      series={[{ label: "CPU", color: "#a78bfa", get: (s) => s.cpu.usagePercent, fill: true }]}
       {sample}
     />
     <LiveChart
       title="Pamięć"
       percent
       format={(v) => `${Math.round(v)}%`}
-      series={[{ label: "RAM", color: "#53d6e8", get: (s) => s.mem.usedPercent, fill: true }]}
+      series={[{ label: "RAM", color: "#a78bfa", get: (s) => s.mem.usedPercent, fill: true }]}
       {sample}
     />
     <LiveChart
       title="Sieć"
       format={bps}
       series={[
-        { label: "pobieranie", color: "#53d6e8", get: (s) => s.net.rxBps, fill: true },
-        { label: "wysyłanie", color: "#ffb454", get: (s) => s.net.txBps, fill: false },
+        { label: "pobieranie", color: "#a78bfa", get: (s) => s.net.rxBps, fill: true },
+        { label: "wysyłanie", color: "#fbbf24", get: (s) => s.net.txBps, fill: false },
       ]}
       {sample}
     />

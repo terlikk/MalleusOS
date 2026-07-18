@@ -5,15 +5,15 @@
    ============================================================ */
 
 :root {
-  --bg: #0b1017;
-  --card: rgba(17, 24, 38, 0.66);
+  --bg: #0d0b1a;
+  --card: rgba(22, 19, 39, 0.66);
   --edge: rgba(238, 242, 247, 0.07);
   --text: #eef2f7;
-  --dim: #8fa0b6;
-  --cyan: #53d6e8;
-  --amber: #ffb454;
-  --red: #ff6b7a;
-  --track: #1b2637;
+  --dim: #9d95b8;
+  --cyan: #a78bfa;
+  --amber: #fbbf24;
+  --red: #fb7185;
+  --track: #241d3d;
   --mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
@@ -22,8 +22,8 @@
 body {
   min-height: 100vh;
   background:
-    radial-gradient(1100px 600px at 85% -10%, rgba(23, 90, 107, 0.35), transparent 60%),
-    radial-gradient(900px 500px at -10% 110%, rgba(16, 46, 77, 0.45), transparent 60%),
+    radial-gradient(1100px 600px at 85% -10%, rgba(88, 61, 158, 0.30), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(47, 32, 96, 0.40), transparent 60%),
     var(--bg);
   color: var(--text);
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;

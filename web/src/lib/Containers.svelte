@@ -143,7 +143,7 @@
     color: var(--dim);
     background: rgba(143, 160, 182, 0.12);
   }
-  .pill.run { color: var(--cyan); background: rgba(83, 214, 232, 0.12); }
+  .pill.run { color: var(--cyan); background: rgba(167, 139, 250, 0.12); }
 
   .btns { display: flex; gap: 0.35rem; justify-content: flex-end; }
   .btns button {
@@ -158,14 +158,14 @@
   }
   .btns button:hover { color: var(--text); }
   .btns button:disabled { opacity: 0.5; cursor: wait; }
-  .btns .play { color: var(--cyan); border-color: rgba(83, 214, 232, 0.35); }
-  .btns button.on { color: var(--cyan); border-color: rgba(83, 214, 232, 0.35); }
+  .btns .play { color: var(--cyan); border-color: rgba(167, 139, 250, 0.35); }
+  .btns button.on { color: var(--cyan); border-color: rgba(167, 139, 250, 0.35); }
 
   .logrow td { padding: 0; border-top: none; }
   pre {
     max-height: 260px;
     overflow: auto;
-    background: rgba(7, 10, 16, 0.7);
+    background: rgba(10, 8, 20, 0.7);
     border-radius: 10px;
     margin: 0 0 0.6rem;
     padding: 0.8rem 1rem;
