@@ -84,10 +84,17 @@ Wymagany Go ≥ 1.24. Najważniejsze polecenia:
 
 ```bash
 make vet        # statyczna analiza kodu
+make web        # zbuduj panel WWW (wymaga Node ≥ 20)
 make build      # binarka na tę maszynę → bin/malleus
 make build-all  # kompilacja krzyżowa: amd64 + arm64
-make run        # zbuduj i uruchom (API na :8443)
+make run        # zbuduj i uruchom (panel na :8443)
 ```
+
+Pełna binarka z panelem: `make web && make build`, potem
+`./bin/malleus` i otwórz `http://localhost:8443` w przeglądarce.
+Do pracy nad samym panelem: `cd web && npm run dev` (Vite serwuje
+panel z podmianą na żywo, a zapytania `/api` przekazuje do
+działającej binarki).
 
 Szybki test API:
 
