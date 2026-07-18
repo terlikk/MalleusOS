@@ -1,14 +1,15 @@
 // MalleusOS — punkt startowy binarki `malleus`.
-// Na razie szkielet: parsuje flagi i wystawia tymczasową stronę.
-// W kolejnych krokach dojdą: agent metryk, API i strumień SSE.
+// Uruchamia agenta metryk (pętla próbkująca co sekundę)
+// i serwer HTTP z API REST + strumieniem SSE.
 package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
-	"net/http"
 	"time"
+
+	"malleus/agent"
+	"malleus/server"
 )
 
 // Wersja wpisana na sztywno; przy wydaniach będzie podmieniana.
@@ -17,22 +18,20 @@ const version = "0.1.0-dev"
 func main() {
 	// flag.String definiuje opcję linii poleceń: ./malleus -addr :8443
 	addr := flag.String("addr", ":8443", "adres, na którym nasłuchuje serwer HTTP")
+	interval := flag.Duration("interval", time.Second, "co ile zbierać próbkę metryk")
 	flag.Parse()
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "MalleusOS %s — panel w budowie\n", version)
-	})
+	kolektor := agent.NewCollector()
+	// 2 godziny historii przy próbce co sekundę = 7200 miejsc w buforze.
+	historia := agent.NewHistory(2*time.Hour, *interval)
 
-	srv := &http.Server{
-		Addr:    *addr,
-		Handler: mux,
-		// Limit czasu na nagłówki chroni przed wiszącymi połączeniami.
-		ReadHeaderTimeout: 5 * time.Second,
-	}
+	// `go` uruchamia pętlę zbierania w tle (goroutine) —
+	// serwer HTTP działa równolegle i tylko czyta wyniki.
+	go kolektor.Run(historia, *interval)
 
-	log.Printf("malleus %s nasłuchuje na %s", version, *addr)
-	if err := srv.ListenAndServe(); err != nil {
+	srv := server.New(kolektor, historia, version)
+	log.Printf("malleus %s — API pod http://localhost%s/api/v1/", version, *addr)
+	if err := srv.ListenAndServe(*addr); err != nil {
 		log.Fatal(err)
 	}
 }
