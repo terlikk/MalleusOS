@@ -43,12 +43,24 @@ func Open(path string) (*DB, error) {
 		return nil, err
 	}
 
-	// Jedna tabela: czas próbki + jej pełny JSON. Czas jest kluczem
-	// głównym, więc zapytania po zakresie czasu są szybkie.
-	if _, err := db.Exec(`CREATE TABLE IF NOT EXISTS samples (
-		time INTEGER PRIMARY KEY,
-		data TEXT NOT NULL
-	)`); err != nil {
+	// Tabele: samples (czas próbki + pełny JSON — czas jest kluczem
+	// głównym, więc zapytania po zakresie są szybkie), config
+	// (ustawienia typu klucz→wartość, m.in. hash hasła) i sessions
+	// (tokeny zalogowanych — przeżywają restart serwera).
+	if _, err := db.Exec(`
+		CREATE TABLE IF NOT EXISTS samples (
+			time INTEGER PRIMARY KEY,
+			data TEXT NOT NULL
+		);
+		CREATE TABLE IF NOT EXISTS config (
+			key   TEXT PRIMARY KEY,
+			value TEXT NOT NULL
+		);
+		CREATE TABLE IF NOT EXISTS sessions (
+			token   TEXT PRIMARY KEY,
+			expires INTEGER NOT NULL
+		);
+	`); err != nil {
 		db.Close()
 		return nil, err
 	}

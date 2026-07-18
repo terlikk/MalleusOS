@@ -12,28 +12,59 @@ import (
 	"time"
 
 	"malleus/agent"
+	"malleus/docker"
 )
 
-// Server spina kolektor metryk i historię z routingiem HTTP.
+// Config zbiera wszystko, czego serwer potrzebuje do działania —
+// jedna struktura zamiast coraz dłuższej listy argumentów.
+type Config struct {
+	Col     *agent.Collector
+	Hist    agent.Store
+	Version string
+	Assets  fs.FS          // zbudowany panel WWW (embed)
+	Docker  *docker.Client // klient socketu Dockera
+	Auth    AuthStore      // nil = logowanie wyłączone (brak bazy)
+}
+
+// Server spina kolektor metryk, historię i Dockera z routingiem HTTP.
 type Server struct {
 	col     *agent.Collector
 	hist    agent.Store
 	version string
-	assets  fs.FS // zbudowany panel WWW (wkompilowany przez embed)
+	assets  fs.FS
+	docker  *docker.Client
+	auth    AuthStore
 	mux     *http.ServeMux
 }
 
-func New(col *agent.Collector, hist agent.Store, version string, assets fs.FS) *Server {
-	s := &Server{col: col, hist: hist, version: version, assets: assets, mux: http.NewServeMux()}
+func New(cfg Config) *Server {
+	s := &Server{
+		col: cfg.Col, hist: cfg.Hist, version: cfg.Version,
+		assets: cfg.Assets, docker: cfg.Docker, auth: cfg.Auth,
+		mux: http.NewServeMux(),
+	}
 
 	// Wzorzec "GET /ścieżka" (Go 1.22+) ogranicza trasę do jednej
 	// metody HTTP — inne dostaną automatycznie 405.
+	//
+	// Otwarte bez logowania: health (dla monitoringu), status/setup/
+	// login (inaczej nie dałoby się zalogować) i pliki panelu
+	// (przeglądarka musi pobrać ekran logowania).
 	s.mux.HandleFunc("GET /api/v1/health", s.handleHealth)
-	s.mux.HandleFunc("GET /api/v1/system", s.handleSystem)
-	s.mux.HandleFunc("GET /api/v1/metrics", s.handleMetrics)
-	s.mux.HandleFunc("GET /api/v1/metrics/history", s.handleHistory)
-	s.mux.HandleFunc("GET /api/v1/stream", s.handleStream)
+	s.mux.HandleFunc("GET /api/v1/auth/status", s.handleAuthStatus)
+	s.mux.HandleFunc("POST /api/v1/setup", s.handleSetup)
+	s.mux.HandleFunc("POST /api/v1/login", s.handleLogin)
+	s.mux.HandleFunc("POST /api/v1/logout", s.handleLogout)
 	s.mux.HandleFunc("GET /", s.handleRoot)
+
+	// Wszystko poniżej wymaga ważnej sesji.
+	s.mux.HandleFunc("GET /api/v1/system", s.protect(s.handleSystem))
+	s.mux.HandleFunc("GET /api/v1/metrics", s.protect(s.handleMetrics))
+	s.mux.HandleFunc("GET /api/v1/metrics/history", s.protect(s.handleHistory))
+	s.mux.HandleFunc("GET /api/v1/stream", s.protect(s.handleStream))
+	s.mux.HandleFunc("GET /api/v1/containers", s.protect(s.handleContainers))
+	s.mux.HandleFunc("POST /api/v1/containers/{id}/{action}", s.protect(s.handleContainerAction))
+	s.mux.HandleFunc("GET /api/v1/containers/{id}/logs", s.protect(s.handleContainerLogs))
 	return s
 }
 
