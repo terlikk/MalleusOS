@@ -50,13 +50,24 @@ func (s *Server) ProxyHandler() http.Handler {
 		}
 		host = strings.ToLower(host)
 
-		// Subdomena? Szukamy aplikacji o takim polu subdomain.
+		// Subdomena? Najpierw aplikacje z katalogu, potem
+		// projekty użytkownika (nazwa projektu = subdomena).
 		if sub, ok := strings.CutSuffix(host, ".malleus.local"); ok && sub != "" {
 			if apps, err := catalog.Load(); err == nil {
 				for _, a := range apps {
 					if a.Subdomain == sub && a.WebPort > 0 {
 						getProxy(a.WebPort).ServeHTTP(w, r)
 						return
+					}
+				}
+			}
+			if s.projects != nil {
+				if ps, err := s.projects.ListProjects(); err == nil {
+					for _, p := range ps {
+						if p.Name == sub && p.HostPort > 0 {
+							getProxy(p.HostPort).ServeHTTP(w, r)
+							return
+						}
 					}
 				}
 			}

@@ -60,6 +60,13 @@ func Open(path string) (*DB, error) {
 			token   TEXT PRIMARY KEY,
 			expires INTEGER NOT NULL
 		);
+		CREATE TABLE IF NOT EXISTS projects (
+			name           TEXT PRIMARY KEY,
+			git_url        TEXT NOT NULL DEFAULT '',
+			container_port INTEGER NOT NULL,
+			host_port      INTEGER NOT NULL,
+			created        INTEGER NOT NULL
+		);
 	`); err != nil {
 		db.Close()
 		return nil, err

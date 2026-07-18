@@ -17,6 +17,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -120,6 +121,31 @@ func main() {
 			w.WriteHeader(http.StatusNoContent)
 		})
 	}
+
+	// --- budowanie obrazow (Moje projekty) ---
+
+	mux.HandleFunc("POST /build", func(w http.ResponseWriter, r *http.Request) {
+		// Prawdziwy Docker czyta kontekst tar — my go tylko połykamy.
+		io.Copy(io.Discard, r.Body)
+		fl := w.(http.Flusher)
+		steps := []string{
+			"Step 1/3 : FROM alpine:latest",
+			"Step 2/3 : COPY . /app",
+			"Step 3/3 : CMD [\"/app/start\"]",
+			"Successfully built abcdef123456",
+			"Successfully tagged " + r.URL.Query().Get("t"),
+		}
+		for _, s := range steps {
+			fmt.Fprintf(w, `{"stream":%q}`+"\n", s+"\n")
+			fl.Flush()
+			time.Sleep(300 * time.Millisecond)
+		}
+	})
+
+	mux.HandleFunc("DELETE /images/{name}", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, `[{"Deleted":"ok"}]`)
+	})
 
 	// --- endpointy instalacji (katalog aplikacji) ---
 

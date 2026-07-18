@@ -42,6 +42,7 @@ func main() {
 	// trzymać, więc auth zostaje wyłączone (z ostrzeżeniem).
 	var magazyn agent.Store
 	var auth server.AuthStore
+	var projekty server.ProjectStore
 	if db, err := storage.Open(filepath.Join(*dataDir, "malleus.db")); err != nil {
 		log.Printf("SQLite niedostępne (%v) — historia w pamięci, LOGOWANIE WYŁĄCZONE", err)
 		magazyn = agent.NewHistory(2*time.Hour, *interval)
@@ -51,6 +52,7 @@ func main() {
 		go db.PruneLoop(24*time.Hour, time.Hour)
 		magazyn = db
 		auth = db
+		projekty = db
 	}
 
 	// `go` uruchamia pętlę zbierania w tle (goroutine) —
@@ -69,8 +71,9 @@ func main() {
 		Hist:    magazyn,
 		Version: version,
 		Assets:  panel,
-		Docker:  docker.New(*dockerSock),
-		Auth:    auth,
+		Docker:   docker.New(*dockerSock),
+		Auth:     auth,
+		Projects: projekty,
 	})
 
 	// Ładne adresy: reverse proxy na :80 (filmy.malleus.local →

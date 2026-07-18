@@ -22,26 +22,29 @@ type Config struct {
 	Hist    agent.Store
 	Version string
 	Assets  fs.FS          // zbudowany panel WWW (embed)
-	Docker  *docker.Client // klient socketu Dockera
-	Auth    AuthStore      // nil = logowanie wyłączone (brak bazy)
+	Docker   *docker.Client // klient socketu Dockera
+	Auth     AuthStore      // nil = logowanie wyłączone (brak bazy)
+	Projects ProjectStore   // nil = projekty wyłączone (brak bazy)
 }
 
 // Server spina kolektor metryk, historię i Dockera z routingiem HTTP.
 type Server struct {
-	col     *agent.Collector
-	hist    agent.Store
-	version string
-	assets  fs.FS
-	docker  *docker.Client
-	auth    AuthStore
-	mux     *http.ServeMux
+	col      *agent.Collector
+	hist     agent.Store
+	version  string
+	assets   fs.FS
+	docker   *docker.Client
+	auth     AuthStore
+	projects ProjectStore
+	mux      *http.ServeMux
 }
 
 func New(cfg Config) *Server {
 	s := &Server{
 		col: cfg.Col, hist: cfg.Hist, version: cfg.Version,
 		assets: cfg.Assets, docker: cfg.Docker, auth: cfg.Auth,
-		mux: http.NewServeMux(),
+		projects: cfg.Projects,
+		mux:      http.NewServeMux(),
 	}
 
 	// Wzorzec "GET /ścieżka" (Go 1.22+) ogranicza trasę do jednej
@@ -68,6 +71,9 @@ func New(cfg Config) *Server {
 	s.mux.HandleFunc("GET /api/v1/catalog", s.protect(s.handleCatalog))
 	s.mux.HandleFunc("POST /api/v1/catalog/{id}/install", s.protect(s.handleCatalogInstall))
 	s.mux.HandleFunc("POST /api/v1/catalog/{id}/uninstall", s.protect(s.handleCatalogUninstall))
+	s.mux.HandleFunc("GET /api/v1/projects", s.protect(s.handleProjects))
+	s.mux.HandleFunc("POST /api/v1/projects", s.protect(s.handleProjectCreate))
+	s.mux.HandleFunc("DELETE /api/v1/projects/{name}", s.protect(s.handleProjectDelete))
 	return s
 }
 
