@@ -78,6 +78,26 @@ Na Raspberry Pi zamień `amd64` na `arm64`.
 | `/image`   | budowa bootowalnego obrazu                       |
 | `/tools`   | narzędzia developerskie                          |
 
+## Dla programistów
+
+Wymagany Go ≥ 1.24. Najważniejsze polecenia:
+
+```bash
+make vet        # statyczna analiza kodu
+make build      # binarka na tę maszynę → bin/malleus
+make build-all  # kompilacja krzyżowa: amd64 + arm64
+make run        # zbuduj i uruchom (API na :8443)
+```
+
+Szybki test API:
+
+```bash
+curl localhost:8443/api/v1/health
+curl localhost:8443/api/v1/metrics
+curl "localhost:8443/api/v1/metrics/history?range=15m"
+curl -N localhost:8443/api/v1/stream   # strumień SSE, Ctrl+C przerywa
+```
+
 ## Licencja
 
 [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html) — używaj, zmieniaj,
