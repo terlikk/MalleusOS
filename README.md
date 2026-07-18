@@ -92,9 +92,20 @@ make run        # zbuduj i uruchom (panel na :8443)
 
 Pełna binarka z panelem: `make web && make build`, potem
 `./bin/malleus` i otwórz `http://localhost:8443` w przeglądarce.
+Przy pierwszym uruchomieniu panel poprosi o ustawienie hasła.
 Do pracy nad samym panelem: `cd web && npm run dev` (Vite serwuje
 panel z podmianą na żywo, a zapytania `/api` przekazuje do
 działającej binarki).
+
+Development bez Dockera — atrapa udająca jego API:
+
+```bash
+go run ./tools/fakedocker &                     # socket /tmp/fakedocker.sock
+./bin/malleus -docker-sock /tmp/fakedocker.sock
+```
+
+Wydanie nowej wersji robi się tagiem — CI zbuduje binarki
+i opublikuje Release samo: `git tag v0.1.0 && git push origin v0.1.0`.
 
 Szybki test API:
 

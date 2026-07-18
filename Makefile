@@ -10,8 +10,10 @@
 # -trimpath i -ldflags "-s -w" odchudzają plik wynikowy.
 # ============================================================
 
-VERSION := 0.1.0-dev
-FLAGS   := -trimpath -ldflags "-s -w"
+# ?= pozwala nadpisać wersję z zewnątrz: make build-all VERSION=v0.1.0
+# (tak robi CI przy wydaniu). -X wpisuje ją w zmienną main.version.
+VERSION ?= 0.1.0-dev
+FLAGS    = -trimpath -ldflags "-s -w -X main.version=$(VERSION)"
 
 # Zbuduj binarkę na bieżącą maszynę → bin/malleus
 build:

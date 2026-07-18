@@ -1,0 +1,49 @@
+# Wydanie — odpala się, gdy wypchniesz tag zaczynający się od "v"
+# (np. v0.1.0). Buduje binarki amd64+arm64 z numerem wersji z taga
+# i publikuje je jako Release na GitHubie. Wtedy linki "Pobierz"
+# na stronie projektu zaczynają działać same z siebie, bo strona
+# pyta API GitHuba o najnowsze wydanie.
+#
+# Jak wydać wersję:
+#   git tag v0.1.0
+#   git push origin v0.1.0
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+# Domyślny token dostaje prawo zapisu, żeby móc utworzyć Release.
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Zbuduj panel WWW
+        run: make web
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Analiza statyczna
+        run: make vet
+
+      - name: Binarki amd64 + arm64 z wersją z taga
+        run: make build-all VERSION=${{ github.ref_name }}
+
+      - name: Opublikuj Release z binarkami
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            bin/malleus-linux-amd64
+            bin/malleus-linux-arm64
+          generate_release_notes: true

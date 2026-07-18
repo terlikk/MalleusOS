@@ -17,8 +17,9 @@ import (
 	"malleus/web"
 )
 
-// Wersja wpisana na sztywno; przy wydaniach będzie podmieniana.
-const version = "0.1.0-dev"
+// Wersja domyślnie "dev"; przy budowaniu wydania podmienia ją
+// linker (flaga -X w Makefile) na numer taga, np. v0.1.0.
+var version = "0.1.0-dev"
 
 func main() {
 	// flag.String definiuje opcję linii poleceń: ./malleus -addr :8443
