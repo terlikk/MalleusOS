@@ -1,0 +1,34 @@
+# Szablon aplikacji z katalogu MalleusOS.
+# Opis pól:
+#   id        — unikalna nazwa techniczna (tak nazywa się kontener)
+#   name      — nazwa wyświetlana w panelu
+#   tagline   — jedno zdanie po ludzku, czym to jest
+#   image     — obraz Dockera do pobrania
+#   webPort   — port WWW aplikacji na hoście (0 = aplikacja bez WWW)
+#   subdomain — docelowy adres subdomeny (filmy.malleus.local — wkrótce)
+#   ports     — mapowania portów host→kontener
+#   volumes   — nazwane wolumeny na dane (tworzą się same)
+#   env       — zmienne środowiskowe z opisem
+id: jellyfin
+name: Jellyfin
+tagline: Własny Netflix — filmy i seriale z Twojego dysku
+image: jellyfin/jellyfin:latest
+webPort: 8096
+subdomain: filmy
+ports:
+  - host: 8096
+    container: 8096
+volumes:
+  - name: config
+    path: /config
+    opis: konfiguracja aplikacji
+  - name: cache
+    path: /cache
+    opis: pamięć podręczna (miniatury itp.)
+  - name: media
+    path: /media
+    opis: Twoje filmy i seriale
+env:
+  - name: TZ
+    value: Europe/Warsaw
+    opis: strefa czasowa

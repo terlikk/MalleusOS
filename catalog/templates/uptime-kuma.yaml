@@ -1,0 +1,13 @@
+id: uptime-kuma
+name: Uptime Kuma
+tagline: Pilnuje Twoich usług i alarmuje, gdy coś padnie
+image: louislam/uptime-kuma:1
+webPort: 3001
+subdomain: status
+ports:
+  - host: 3001
+    container: 3001
+volumes:
+  - name: data
+    path: /app/data
+    opis: konfiguracja i historia monitoringu

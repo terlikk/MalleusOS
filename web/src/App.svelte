@@ -7,6 +7,7 @@
   import Disks from "./lib/Disks.svelte";
   import Temps from "./lib/Temps.svelte";
   import Containers from "./lib/Containers.svelte";
+  import Catalog from "./lib/Catalog.svelte";
   import Login from "./lib/Login.svelte";
   import { getJSON, streamMetrics } from "./lib/api.js";
   import { bytes, bps, rdzenie } from "./lib/format.js";
@@ -133,6 +134,10 @@
 
   <div class="containers">
     <Containers />
+  </div>
+
+  <div class="containers">
+    <Catalog />
   </div>
 
   <div class="grid-bottom">

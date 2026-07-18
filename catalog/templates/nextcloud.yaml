@@ -1,0 +1,17 @@
+id: nextcloud
+name: Nextcloud
+tagline: Własna chmura na pliki, zdjęcia i kalendarz
+image: nextcloud:stable
+webPort: 8081
+subdomain: chmura
+ports:
+  - host: 8081
+    container: 80
+volumes:
+  - name: html
+    path: /var/www/html
+    opis: aplikacja i Twoje pliki
+env:
+  - name: TZ
+    value: Europe/Warsaw
+    opis: strefa czasowa

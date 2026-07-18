@@ -121,6 +121,48 @@ func main() {
 		})
 	}
 
+	// --- endpointy instalacji (katalog aplikacji) ---
+
+	mux.HandleFunc("POST /images/create", func(w http.ResponseWriter, r *http.Request) {
+		// Udawany postęp pobierania obrazu — kilka linii JSON,
+		// jak z prawdziwego rejestru.
+		fl := w.(http.Flusher)
+		for _, status := range []string{"Pulling fs layer", "Downloading", "Extracting", "Pull complete"} {
+			fmt.Fprintf(w, `{"status":%q}`+"\n", status)
+			fl.Flush()
+			time.Sleep(250 * time.Millisecond)
+		}
+	})
+
+	mux.HandleFunc("POST /containers/create", func(w http.ResponseWriter, r *http.Request) {
+		name := r.URL.Query().Get("name")
+		var body struct {
+			Image string `json:"Image"`
+		}
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		mu.Lock()
+		containers = append(containers, &fakeContainer{
+			ID: "fake" + name + "00000000", Name: name,
+			Image: body.Image, State: "exited",
+		})
+		mu.Unlock()
+		w.WriteHeader(http.StatusCreated)
+		fmt.Fprintf(w, `{"Id":"fake%s00000000"}`, name)
+	})
+
+	mux.HandleFunc("DELETE /containers/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id := r.PathValue("id")
+		mu.Lock()
+		for i, c := range containers {
+			if c.ID == id || c.Name == id {
+				containers = append(containers[:i], containers[i+1:]...)
+				break
+			}
+		}
+		mu.Unlock()
+		w.WriteHeader(http.StatusNoContent)
+	})
+
 	mux.HandleFunc("GET /containers/{id}/logs", func(w http.ResponseWriter, r *http.Request) {
 		c := find(r.PathValue("id"))
 		if c == nil {

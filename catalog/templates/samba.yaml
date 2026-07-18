@@ -1,0 +1,20 @@
+id: samba
+name: Samba
+tagline: Dysk sieciowy widoczny w Windowsie i na Macu
+image: dperson/samba:latest
+webPort: 0 # bez panelu WWW — montujesz jako dysk sieciowy
+subdomain: pliki
+ports:
+  - host: 445
+    container: 445
+volumes:
+  - name: share
+    path: /share
+    opis: udostępniany folder
+env:
+  - name: USER
+    value: malleus;malleus
+    opis: login;hasło do udziału — zmień hasło!
+  - name: SHARE
+    value: pliki;/share;yes;no;no;malleus
+    opis: definicja udziału (nazwa;ścieżka;przeglądalny;tylko-odczyt;goście;użytkownik)

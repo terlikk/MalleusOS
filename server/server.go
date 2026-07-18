@@ -65,6 +65,9 @@ func New(cfg Config) *Server {
 	s.mux.HandleFunc("GET /api/v1/containers", s.protect(s.handleContainers))
 	s.mux.HandleFunc("POST /api/v1/containers/{id}/{action}", s.protect(s.handleContainerAction))
 	s.mux.HandleFunc("GET /api/v1/containers/{id}/logs", s.protect(s.handleContainerLogs))
+	s.mux.HandleFunc("GET /api/v1/catalog", s.protect(s.handleCatalog))
+	s.mux.HandleFunc("POST /api/v1/catalog/{id}/install", s.protect(s.handleCatalogInstall))
+	s.mux.HandleFunc("POST /api/v1/catalog/{id}/uninstall", s.protect(s.handleCatalogUninstall))
 	return s
 }
 

@@ -1,0 +1,15 @@
+id: kiwix
+name: Kiwix
+tagline: Wikipedia (i nie tylko) offline, bez internetu
+image: ghcr.io/kiwix/kiwix-serve:latest
+webPort: 8083
+subdomain: wiki
+ports:
+  - host: 8083
+    container: 8080
+volumes:
+  - name: data
+    path: /data
+    opis: pliki .zim (paczki treści — pobierz z library.kiwix.org)
+# kiwix-serve wymaga wskazania plików; * obejmuje wszystkie .zim w /data
+cmd: ["*.zim"]

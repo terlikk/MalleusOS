@@ -1,0 +1,25 @@
+id: pihole
+name: Pi-hole
+tagline: Koniec reklam w całej domowej sieci
+image: pihole/pihole:latest
+webPort: 8082
+subdomain: dns
+ports:
+  - host: 8082
+    container: 80
+  - host: 53
+    container: 53
+  - host: 53
+    container: 53
+    protocol: udp
+volumes:
+  - name: etc
+    path: /etc/pihole
+    opis: konfiguracja i listy blokowania
+env:
+  - name: TZ
+    value: Europe/Warsaw
+    opis: strefa czasowa
+  - name: WEBPASSWORD
+    value: malleus
+    opis: hasło panelu Pi-hole — zmień po pierwszym logowaniu!
