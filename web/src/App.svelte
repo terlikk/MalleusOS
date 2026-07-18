@@ -6,6 +6,8 @@
   import LiveChart from "./lib/LiveChart.svelte";
   import Disks from "./lib/Disks.svelte";
   import Temps from "./lib/Temps.svelte";
+  import Containers from "./lib/Containers.svelte";
+  import Login from "./lib/Login.svelte";
   import { getJSON, streamMetrics } from "./lib/api.js";
   import { bytes, bps, rdzenie } from "./lib/format.js";
 
@@ -15,9 +17,29 @@
   let sample = $state(null);
   let online = $state(false);
 
+  // Bramka logowania: zanim pokażemy panel, pytamy serwer,
+  // czy hasło jest ustawione i czy mamy ważną sesję.
+  let auth = $state(null); // null = jeszcze sprawdzamy
+
+  async function checkAuth() {
+    try {
+      auth = await getJSON("/api/v1/auth/status");
+    } catch {
+      // serwer nie odpowiada — spróbujemy ponownie za chwilę
+      setTimeout(checkAuth, 2000);
+    }
+  }
+
   // $effect uruchamia się po zamontowaniu komponentu;
   // zwracana funkcja sprząta (zamyka strumień) przy odmontowaniu.
   $effect(() => {
+    checkAuth();
+  });
+
+  // Dane pobieramy dopiero PO zalogowaniu — inaczej dostalibyśmy
+  // same odpowiedzi 401.
+  $effect(() => {
+    if (!auth?.authenticated) return;
     getJSON("/api/v1/system").then((s) => (system = s)).catch(() => {});
     const stop = streamMetrics(
       (s) => (sample = s),
@@ -42,6 +64,13 @@
   const GB = 1024 * 1024; // kB → GB (pamięć raportujemy w kB)
 </script>
 
+{#if auth == null}
+  <!-- jeszcze nie wiemy, czy trzeba się logować -->
+{:else if !auth.setupDone}
+  <Login setup onSuccess={checkAuth} />
+{:else if !auth.authenticated}
+  <Login onSuccess={checkAuth} />
+{:else}
 <div class="layout">
   <Header {system} {online} />
 
@@ -102,8 +131,17 @@
     />
   </div>
 
+  <div class="containers">
+    <Containers />
+  </div>
+
   <div class="grid-bottom">
     <Disks disks={sample?.disks ?? []} />
     <Temps temps={sample?.temps ?? []} />
   </div>
 </div>
+{/if}
+
+<style>
+  .containers { margin-bottom: 1rem; }
+</style>
