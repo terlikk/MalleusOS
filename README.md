@@ -116,6 +116,10 @@ go run ./tools/fakedocker &                     # socket /tmp/fakedocker.sock
 Wydanie nowej wersji robi się tagiem — CI zbuduje binarki
 i opublikuje Release samo: `git tag v0.1.0 && git push origin v0.1.0`.
 
+Bootowalny obraz na pendrive'a (system w RAM, dane na osobnej
+partycji): `make image` — szczegóły i ograniczenia w
+[image/README.md](image/README.md).
+
 Szybki test API:
 
 ```bash

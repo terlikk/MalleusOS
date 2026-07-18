@@ -32,9 +32,14 @@ vet:
 run: build
 	./bin/malleus
 
-.PHONY: build build-all vet run web
+.PHONY: build build-all vet run web image
 
 # Zbuduj panel WWW (wynik: web/dist — wkompilowywany w binarkę).
 # Pełna binarka z panelem: make web && make build
 web:
 	cd web && npm install && npm run build
+
+# Bootowalny obraz na pendrive'a (wymaga roota i pakietu syslinux).
+# Szczegóły: image/README.md
+image:
+	sudo sh image/build.sh

@@ -1,0 +1,22 @@
+#!/sbin/openrc-run
+# Usługa OpenRC uruchamiająca MalleusOS przy starcie systemu.
+# OpenRC to menedżer usług Alpine — odpowiednik systemd.
+
+name="malleus"
+description="MalleusOS — panel homelabu"
+
+command="/usr/local/bin/malleus"
+# Dane na partycji trwałej (patrz /etc/fstab) — przeżywają restart,
+# choć sam system żyje w RAM.
+command_args="-data /var/lib/malleus/data"
+command_background="yes"
+pidfile="/run/malleus.pid"
+output_log="/var/log/malleus.log"
+error_log="/var/log/malleus.log"
+
+depend() {
+	need net localmount
+	# Docker instaluje się przy pierwszym starcie z internetem —
+	# malleus i tak startuje (łagodna degradacja bez Dockera).
+	after docker
+}
