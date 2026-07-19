@@ -1,0 +1,26 @@
+id: minecraft-bedrock
+name: Minecraft (Bedrock)
+tagline: Serwer dla grających na telefonie, konsoli i Windows 10/11
+image: itzg/minecraft-bedrock-server:latest
+webPort: 0
+subdomain: bedrock
+kategoria: gry
+connect: "HOST:19132"
+ports:
+  - host: 19132
+    container: 19132
+    protocol: udp # Bedrock gada po UDP, nie TCP
+volumes:
+  - name: data
+    path: /data
+    opis: świat i konfiguracja serwera
+env:
+  - name: EULA
+    value: "TRUE"
+    opis: akceptacja licencji Minecrafta (wymagane)
+  - name: SERVER_NAME
+    value: Serwer na MalleusOS
+    opis: nazwa widoczna na liście serwerów w grze
+  - name: TZ
+    value: Europe/Warsaw
+    opis: strefa czasowa

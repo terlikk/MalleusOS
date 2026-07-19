@@ -26,6 +26,13 @@ type App struct {
 	Volumes   []Volume `yaml:"volumes" json:"volumes"`
 	Env       []EnvVar `yaml:"env" json:"env"`
 	Cmd       []string `yaml:"cmd" json:"cmd,omitempty"`
+
+	// Kategoria grupuje aplikacje w panelu (puste = zwykła apka,
+	// "gry" = sekcja Serwery gier).
+	Kategoria string `yaml:"kategoria" json:"kategoria,omitempty"`
+	// Connect to podpowiedź połączenia dla aplikacji bez WWW,
+	// np. "HOST:25565" — panel podmienia HOST na adres serwera.
+	Connect string `yaml:"connect" json:"connect,omitempty"`
 }
 
 type Port struct {

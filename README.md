@@ -24,6 +24,8 @@ i tryb kiosku na wbudowany ekranik LCD.
   chmura), Pi-hole (blokowanie reklam), Samba (dysk sieciowy), Uptime Kuma
   (monitoring usług), Kiwix (Wikipedia offline) — instalacja jednym
   kliknięciem, adresy w rodzaju `nazwa.malleus.local`.
+- **Serwery gier** — Minecraft Java i Bedrock jednym kliknięciem;
+  panel od razu pokazuje adres, który znajomi wpisują w grze.
 - **Deploy własnych aplikacji** — wskazujesz repozytorium git albo ZIP,
   serwer buduje i uruchamia projekt, logi budowania na żywo.
 - **Panel zamknięty na hasło** — logowanie od pierwszego uruchomienia.

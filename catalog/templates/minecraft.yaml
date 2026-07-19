@@ -1,0 +1,29 @@
+id: minecraft
+name: Minecraft (Java)
+tagline: Własny serwer Minecrafta dla znajomych z PC
+image: itzg/minecraft-server:latest
+webPort: 0 # bez panelu WWW — gracze łączą się z gry
+subdomain: minecraft
+kategoria: gry
+# HOST podmienia się w panelu na adres Twojego serwera
+connect: "HOST:25565"
+ports:
+  - host: 25565
+    container: 25565
+volumes:
+  - name: data
+    path: /data
+    opis: świat, gracze i konfiguracja serwera
+env:
+  - name: EULA
+    value: "TRUE"
+    opis: akceptacja licencji Minecrafta (wymagane przez Mojang)
+  - name: MEMORY
+    value: 2G
+    opis: RAM dla serwera — zwiększ przy większej liczbie graczy
+  - name: MOTD
+    value: Serwer na MalleusOS
+    opis: opis widoczny na liście serwerów w grze
+  - name: TZ
+    value: Europe/Warsaw
+    opis: strefa czasowa

@@ -63,7 +63,50 @@
     }
     return `http://${host}:${app.webPort}`;
   }
+
+  // Adres do wklejenia w grze: szablon "HOST:25565" z podmienionym
+  // HOST na adres serwera (ten, pod którym otwarto panel).
+  function connectAddr(app) {
+    return app.connect?.replace("HOST", window.location.hostname) ?? "";
+  }
+
+  // Podział na sekcje: zwykłe aplikacje i serwery gier.
+  let zwykle = $derived(apps.filter((a) => a.kategoria !== "gry"));
+  let gry = $derived(apps.filter((a) => a.kategoria === "gry"));
 </script>
+
+{#snippet appRow(app)}
+  <div class="app">
+    <div class="ico" class:game={app.kategoria === "gry"} aria-hidden="true">{app.name[0]}</div>
+    <div class="info">
+      <b>{app.name}</b>
+      <span>{app.tagline}</span>
+      {#if app.installed && app.subdomain && app.webPort > 0}
+        <span class="addr mono">{app.subdomain}.malleus.local</span>
+      {/if}
+      {#if app.installed && app.connect}
+        <span class="addr mono" title="Ten adres znajomi wpisują w grze">
+          adres w grze: {connectAddr(app)}
+        </span>
+      {/if}
+      {#if errors[app.id]}
+        <span class="error">{errors[app.id]}</span>
+      {/if}
+    </div>
+    <div class="act">
+      {#if busy === app.id}
+        <span class="busy">instalowanie…</span>
+      {:else if app.installed}
+        {#if app.webPort > 0}
+          <a class="open" href={urlFor(app)} target="_blank" rel="noopener">Otwórz</a>
+        {/if}
+        <button class="del" onclick={() => uninstall(app)} title="Usuń aplikację">usuń</button>
+      {:else if available}
+        <button class="install" onclick={() => install(app)}>Zainstaluj</button>
+      {/if}
+    </div>
+  </div>
+{/snippet}
 
 <div class="card">
   <div class="head">
@@ -76,34 +119,22 @@
   {/if}
 
   <div class="apps">
-    {#each apps as app (app.id)}
-      <div class="app">
-        <div class="ico" aria-hidden="true">{app.name[0]}</div>
-        <div class="info">
-          <b>{app.name}</b>
-          <span>{app.tagline}</span>
-          {#if app.installed && app.subdomain && app.webPort > 0}
-            <span class="addr mono">{app.subdomain}.malleus.local</span>
-          {/if}
-          {#if errors[app.id]}
-            <span class="error">{errors[app.id]}</span>
-          {/if}
-        </div>
-        <div class="act">
-          {#if busy === app.id}
-            <span class="busy">instalowanie…</span>
-          {:else if app.installed}
-            {#if app.webPort > 0}
-              <a class="open" href={urlFor(app)} target="_blank" rel="noopener">Otwórz</a>
-            {/if}
-            <button class="del" onclick={() => uninstall(app)} title="Usuń aplikację">usuń</button>
-          {:else if available}
-            <button class="install" onclick={() => install(app)}>Zainstaluj</button>
-          {/if}
-        </div>
-      </div>
+    {#each zwykle as app (app.id)}
+      {@render appRow(app)}
     {/each}
   </div>
+
+  {#if gry.length > 0}
+    <div class="games-head">
+      <h3>Serwery gier</h3>
+      <span class="hint">postaw serwer i podeślij znajomym adres — dołączą z gry</span>
+    </div>
+    <div class="apps">
+      {#each gry as app (app.id)}
+        {@render appRow(app)}
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -147,6 +178,31 @@
   .info span { font-size: 0.76rem; color: var(--dim); }
   .info .error { color: var(--red); }
   .info .addr { font-size: 0.72rem; color: var(--cyan); opacity: 0.85; }
+
+  .games-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1.4rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--edge);
+  }
+  .games-head h3 {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .games-head .hint { margin-left: auto; }
+
+  /* ikonki gier na bursztynowo — od razu widać inną kategorię */
+  .ico.game {
+    background: rgba(251, 191, 36, 0.1);
+    color: var(--amber);
+    border-color: rgba(251, 191, 36, 0.25);
+  }
 
   .act { margin-left: auto; flex: none; display: flex; gap: 0.4rem; align-items: center; }
 
