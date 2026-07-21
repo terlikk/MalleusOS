@@ -1,0 +1,13 @@
+id: playit
+name: playit.gg
+tagline: Wpuść znajomych z internetu — tunel bez grzebania w routerze
+image: ghcr.io/playit-cloud/playit-agent:latest
+webPort: 0
+kategoria: gry
+# Agent tunelu musi widzieć sieć serwera bezpośrednio
+network: host
+env:
+  - name: SECRET_KEY
+    value: ""
+    pytaj: true
+    opis: klucz agenta — załóż konto na playit.gg, wejdź w Agents → New Agent (Docker) i skopiuj Secret Key

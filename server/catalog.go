@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -54,6 +55,10 @@ func (s *Server) handleCatalog(w http.ResponseWriter, r *http.Request) {
 // pobiera obraz, tworzy kontener z portami/wolumenami/env
 // z szablonu i uruchamia go. Może potrwać (pobieranie obrazu!) —
 // panel pokazuje w tym czasie "instalowanie…".
+//
+// Opcjonalne ciało żądania {"env": {"NAZWA": "wartość"}} pozwala
+// uzupełnić pola oznaczone w szablonie jako pytaj (np. klucz
+// playit.gg). Nadpisać można tylko zmienne istniejące w szablonie.
 func (s *Server) handleCatalogInstall(w http.ResponseWriter, r *http.Request) {
 	app, err := catalog.ByID(r.PathValue("id"))
 	if err != nil {
@@ -61,18 +66,36 @@ func (s *Server) handleCatalogInstall(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.docker.PullImage(r.Context(), app.Image); err != nil {
-		writeJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
-		return
+	var body struct {
+		Env map[string]string `json:"env"`
+	}
+	if r.Body != nil {
+		_ = json.NewDecoder(http.MaxBytesReader(w, r.Body, 64*1024)).Decode(&body)
 	}
 
 	spec := docker.CreateSpec{
-		Image:  app.Image,
-		Cmd:    app.Cmd,
-		Labels: map[string]string{"malleus.app": app.ID},
+		Image:   app.Image,
+		Cmd:     app.Cmd,
+		Network: app.Network,
+		Labels:  map[string]string{"malleus.app": app.ID},
 	}
 	for _, e := range app.Env {
-		spec.Env = append(spec.Env, e.Name+"="+e.Value)
+		value := e.Value
+		if v, ok := body.Env[e.Name]; ok && v != "" {
+			value = v
+		}
+		if e.Pytaj && value == "" {
+			writeJSON(w, http.StatusBadRequest, map[string]string{
+				"error": "uzupełnij pole " + e.Name + " (" + e.Opis + ")",
+			})
+			return
+		}
+		spec.Env = append(spec.Env, e.Name+"="+value)
+	}
+
+	if err := s.docker.PullImage(r.Context(), app.Image); err != nil {
+		writeJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
 	}
 	for _, p := range app.Ports {
 		spec.Ports = append(spec.Ports, docker.PortMap{

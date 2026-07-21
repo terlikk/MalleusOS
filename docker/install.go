@@ -47,12 +47,13 @@ func (c *Client) PullImage(ctx context.Context, image string) error {
 
 // CreateSpec opisuje kontener do utworzenia.
 type CreateSpec struct {
-	Image  string
-	Env    []string          // "KLUCZ=wartość"
-	Cmd    []string          // polecenie startowe (puste = domyślne obrazu)
-	Ports  []PortMap         // mapowania host→kontener
-	Binds  []string          // "wolumen:/ścieżka"
-	Labels map[string]string // etykiety, np. malleus.app=jellyfin
+	Image   string
+	Env     []string          // "KLUCZ=wartość"
+	Cmd     []string          // polecenie startowe (puste = domyślne obrazu)
+	Ports   []PortMap         // mapowania host→kontener
+	Binds   []string          // "wolumen:/ścieżka"
+	Labels  map[string]string // etykiety, np. malleus.app=jellyfin
+	Network string            // "host" = sieć współdzielona z serwerem
 }
 
 type PortMap struct {
@@ -79,16 +80,23 @@ func (c *Client) CreateContainer(ctx context.Context, name string, spec CreateSp
 		})
 	}
 
+	hostConfig := map[string]any{
+		"PortBindings":  bindings,
+		"Binds":         spec.Binds,
+		"RestartPolicy": map[string]string{"Name": "unless-stopped"},
+	}
+	if spec.Network != "" {
+		// W trybie "host" kontener używa sieci serwera wprost —
+		// mapowania portów nie mają wtedy zastosowania.
+		hostConfig["NetworkMode"] = spec.Network
+	}
+
 	body := map[string]any{
 		"Image":        spec.Image,
 		"Env":          spec.Env,
 		"Labels":       spec.Labels,
 		"ExposedPorts": exposed,
-		"HostConfig": map[string]any{
-			"PortBindings":  bindings,
-			"Binds":         spec.Binds,
-			"RestartPolicy": map[string]string{"Name": "unless-stopped"},
-		},
+		"HostConfig":   hostConfig,
 	}
 	if len(spec.Cmd) > 0 {
 		body["Cmd"] = spec.Cmd

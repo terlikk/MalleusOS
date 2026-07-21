@@ -33,6 +33,9 @@ type App struct {
 	// Connect to podpowiedź połączenia dla aplikacji bez WWW,
 	// np. "HOST:25565" — panel podmienia HOST na adres serwera.
 	Connect string `yaml:"connect" json:"connect,omitempty"`
+	// Network "host" = kontener współdzieli sieć z serwerem
+	// (wymagane np. przez agenta tunelu playit.gg).
+	Network string `yaml:"network" json:"network,omitempty"`
 }
 
 type Port struct {
@@ -51,6 +54,9 @@ type EnvVar struct {
 	Name  string `yaml:"name" json:"name"`
 	Value string `yaml:"value" json:"value"`
 	Opis  string `yaml:"opis" json:"opis"`
+	// Pytaj = wartość podaje użytkownik przy instalacji
+	// (np. klucz z playit.gg albo hasło do udziału Samby).
+	Pytaj bool `yaml:"pytaj" json:"pytaj,omitempty"`
 }
 
 // Load wczytuje i parsuje wszystkie szablony (posortowane po nazwie).

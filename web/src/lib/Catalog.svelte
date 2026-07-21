@@ -26,13 +26,40 @@
     return () => clearInterval(t);
   });
 
+  // Aplikacja z polami "pytaj" (np. klucz playit.gg) najpierw
+  // rozwija mini-formularz; formId mówi, który kafelek jest otwarty.
+  let formId = $state(null);
+  let formValues = $state({});
+
+  function askable(app) {
+    return (app.env ?? []).filter((e) => e.pytaj);
+  }
+
+  function startInstall(app) {
+    if (askable(app).length > 0 && formId !== app.id) {
+      formId = app.id;
+      formValues = Object.fromEntries(askable(app).map((e) => [e.name, e.value]));
+      return;
+    }
+    install(app);
+  }
+
   async function install(app) {
     busy = app.id;
     errors = { ...errors, [app.id]: null };
     try {
-      const res = await fetch(`/api/v1/catalog/${app.id}/install`, { method: "POST" });
+      const res = await fetch(`/api/v1/catalog/${app.id}/install`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ env: formValues }),
+      });
       const body = await res.json();
-      if (!res.ok) errors = { ...errors, [app.id]: body.error };
+      if (!res.ok) {
+        errors = { ...errors, [app.id]: body.error };
+      } else {
+        formId = null;
+        formValues = {};
+      }
       await refresh();
     } catch {
       errors = { ...errors, [app.id]: "brak połączenia z serwerem" };
@@ -76,35 +103,52 @@
 </script>
 
 {#snippet appRow(app)}
-  <div class="app">
-    <div class="ico" class:game={app.kategoria === "gry"} aria-hidden="true">{app.name[0]}</div>
-    <div class="info">
-      <b>{app.name}</b>
-      <span>{app.tagline}</span>
-      {#if app.installed && app.subdomain && app.webPort > 0}
-        <span class="addr mono">{app.subdomain}.malleus.local</span>
-      {/if}
-      {#if app.installed && app.connect}
-        <span class="addr mono" title="Ten adres znajomi wpisują w grze">
-          adres w grze: {connectAddr(app)}
-        </span>
-      {/if}
-      {#if errors[app.id]}
-        <span class="error">{errors[app.id]}</span>
-      {/if}
-    </div>
-    <div class="act">
-      {#if busy === app.id}
-        <span class="busy">instalowanie…</span>
-      {:else if app.installed}
-        {#if app.webPort > 0}
-          <a class="open" href={urlFor(app)} target="_blank" rel="noopener">Otwórz</a>
+  <div class="app" class:open-form={formId === app.id}>
+    <div class="row">
+      <div class="ico" class:game={app.kategoria === "gry"} aria-hidden="true">{app.name[0]}</div>
+      <div class="info">
+        <b>{app.name}</b>
+        <span>{app.tagline}</span>
+        {#if app.installed && app.subdomain && app.webPort > 0}
+          <span class="addr mono">{app.subdomain}.malleus.local</span>
         {/if}
-        <button class="del" onclick={() => uninstall(app)} title="Usuń aplikację">usuń</button>
-      {:else if available}
-        <button class="install" onclick={() => install(app)}>Zainstaluj</button>
-      {/if}
+        {#if app.installed && app.connect}
+          <span class="addr mono" title="Ten adres znajomi wpisują w grze">
+            adres w grze: {connectAddr(app)}
+          </span>
+        {/if}
+        {#if errors[app.id]}
+          <span class="error">{errors[app.id]}</span>
+        {/if}
+      </div>
+      <div class="act">
+        {#if busy === app.id}
+          <span class="busy">instalowanie…</span>
+        {:else if app.installed}
+          {#if app.webPort > 0}
+            <a class="open" href={urlFor(app)} target="_blank" rel="noopener">Otwórz</a>
+          {/if}
+          <button class="del" onclick={() => uninstall(app)} title="Usuń aplikację">usuń</button>
+        {:else if available}
+          <button class="install" onclick={() => startInstall(app)}>Zainstaluj</button>
+        {/if}
+      </div>
     </div>
+
+    {#if formId === app.id && busy !== app.id}
+      <div class="ask">
+        {#each askable(app) as e (e.name)}
+          <label>
+            {e.opis}
+            <input bind:value={formValues[e.name]} placeholder={e.name} />
+          </label>
+        {/each}
+        <div class="ask-actions">
+          <button class="install" onclick={() => install(app)}>Instaluj</button>
+          <button class="cancel" onclick={() => (formId = null)}>anuluj</button>
+        </div>
+      </div>
+    {/if}
   </div>
 {/snippet}
 
@@ -149,14 +193,54 @@
   }
 
   .app {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
     background: rgba(13, 11, 26, 0.45);
     border: 1px solid var(--edge);
     border-radius: 14px;
     padding: 0.9rem 1rem;
   }
+  .app.open-form { border-color: rgba(167, 139, 250, 0.35); }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  /* mini-formularz pól "pytaj" rozwijany pod wierszem */
+  .ask {
+    margin-top: 0.9rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--edge);
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .ask label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.76rem;
+    color: var(--dim);
+  }
+  .ask input {
+    font: inherit;
+    color: var(--text);
+    background: rgba(13, 11, 26, 0.7);
+    border: 1px solid var(--edge);
+    border-radius: 8px;
+    padding: 0.5rem 0.7rem;
+  }
+  .ask input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .ask-actions { display: flex; gap: 0.5rem; }
+  .cancel {
+    font: inherit;
+    font-size: 0.78rem;
+    color: var(--dim);
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .cancel:hover { color: var(--text); }
 
   .ico {
     flex: none;
