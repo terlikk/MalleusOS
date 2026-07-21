@@ -130,6 +130,60 @@
   // Podział na sekcje: zwykłe aplikacje i serwery gier.
   let zwykle = $derived(apps.filter((a) => a.kategoria !== "gry"));
   let gry = $derived(apps.filter((a) => a.kategoria === "gry"));
+
+  // Własny szablon: formularz z prostymi polami tekstowymi,
+  // serwer robi z nich zwykły szablon YAML w katalogu danych.
+  let customOpen = $state(false);
+  let customBusy = $state(false);
+  let customError = $state("");
+  let cf = $state({ name: "", tagline: "", image: "", webPort: "", ports: "", volumes: "", env: "" });
+
+  async function customCreate() {
+    customBusy = true;
+    customError = "";
+    // Pola-listy rozdzielamy przecinkami (zmienne też enterem)
+    const list = (s, sep = /[,\n]/) => s.split(sep).map((x) => x.trim()).filter(Boolean);
+    try {
+      const res = await fetch("/api/v1/catalog/custom", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: cf.name,
+          tagline: cf.tagline,
+          image: cf.image,
+          webPort: Number(cf.webPort) || 0,
+          ports: list(cf.ports),
+          volumes: list(cf.volumes),
+          env: list(cf.env),
+        }),
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        customError = body.error;
+      } else {
+        customOpen = false;
+        cf = { name: "", tagline: "", image: "", webPort: "", ports: "", volumes: "", env: "" };
+        await refresh();
+      }
+    } catch {
+      customError = "brak połączenia z serwerem";
+    } finally {
+      customBusy = false;
+    }
+  }
+
+  async function customDelete(app) {
+    if (!confirm(`Usunąć szablon ${app.name} z katalogu?`)) return;
+    busy = app.id;
+    try {
+      const res = await fetch(`/api/v1/catalog/custom/${app.id}`, { method: "DELETE" });
+      const body = await res.json();
+      if (!res.ok) errors = { ...errors, [app.id]: body.error };
+      await refresh();
+    } finally {
+      busy = null;
+    }
+  }
 </script>
 
 {#snippet appRow(app)}
@@ -137,7 +191,7 @@
     <div class="row">
       <div class="ico" class:game={app.kategoria === "gry"} aria-hidden="true">{app.name[0]}</div>
       <div class="info">
-        <b>{app.name}</b>
+        <b>{app.name}{#if app.custom}<span class="badge">własna</span>{/if}</b>
         <span>{app.tagline}</span>
         {#if app.installed && app.subdomain && app.webPort > 0}
           <span class="addr mono">{app.subdomain}.malleus.local</span>
@@ -178,6 +232,10 @@
           <button class="del" onclick={() => uninstall(app)} title="Usuń aplikację">usuń</button>
         {:else if available}
           <button class="install" onclick={() => startInstall(app)}>Zainstaluj</button>
+          {#if app.custom}
+            <button class="del" onclick={() => customDelete(app)}
+                    title="Usuń szablon z katalogu">usuń szablon</button>
+          {/if}
         {/if}
       </div>
     </div>
@@ -203,10 +261,65 @@
   <div class="head">
     <h2>Katalog aplikacji</h2>
     <span class="hint">jedno kliknięcie — MalleusOS sam pobierze i skonfiguruje</span>
+    <button class="add-custom" onclick={() => (customOpen = !customOpen)}>
+      {customOpen ? "zwiń formularz" : "+ dodaj własną"}
+    </button>
   </div>
 
   {#if !available}
     <p class="empty">Docker jest niedostępny — instalacja aplikacji poczeka, aż wróci.</p>
+  {/if}
+
+  {#if customOpen}
+    <!-- Formularz własnego szablonu: wystarczą nazwa i obraz,
+         reszta opcjonalna. Serwer zapisuje z tego YAML. -->
+    <div class="custom-form">
+      <p class="cf-intro">
+        Dodaj dowolną aplikację z
+        <a href="https://hub.docker.com" target="_blank" rel="noopener">Docker Huba</a>
+        — wystarczy nazwa i obraz. Po dodaniu instalujesz ją jak każdą inną,
+        z aktualizacjami i kopią zapasową w zestawie.
+      </p>
+      <div class="cf-grid">
+        <label>
+          nazwa *
+          <input bind:value={cf.name} placeholder="np. Moja Strona" />
+        </label>
+        <label>
+          obraz Dockera *
+          <input bind:value={cf.image} placeholder="np. nginx:latest" />
+        </label>
+        <label>
+          opis (jedno zdanie)
+          <input bind:value={cf.tagline} placeholder="np. strona domowa na nginx" />
+        </label>
+        <label>
+          port WWW <span class="cf-note">(jeśli apka ma panel w przeglądarce)</span>
+          <input bind:value={cf.webPort} placeholder="np. 8080" inputmode="numeric" />
+        </label>
+        <label>
+          dodatkowe porty <span class="cf-note">(serwer:kontener, po przecinku)</span>
+          <input bind:value={cf.ports} placeholder="np. 8080:80, 25565:25565/udp" />
+        </label>
+        <label>
+          foldery na dane <span class="cf-note">(ścieżki w kontenerze, po przecinku)</span>
+          <input bind:value={cf.volumes} placeholder="np. /data, /config" />
+        </label>
+        <label class="cf-wide">
+          zmienne środowiskowe <span class="cf-note">(NAZWA=wartość, po przecinku)</span>
+          <input bind:value={cf.env} placeholder="np. TZ=Europe/Warsaw, HASLO=sekret" />
+        </label>
+      </div>
+      {#if customError}
+        <span class="error">{customError}</span>
+      {/if}
+      <div class="ask-actions">
+        <button class="install" disabled={customBusy} onclick={customCreate}>
+          {customBusy ? "dodawanie…" : "Dodaj do katalogu"}
+        </button>
+        <button class="cancel" onclick={() => (customOpen = false)}>anuluj</button>
+      </div>
+    </div>
   {/if}
 
   <div class="apps">
@@ -393,4 +506,71 @@
   a.del:hover { color: var(--cyan); border-color: rgba(167, 139, 250, 0.4); }
 
   .busy { font-size: 0.8rem; color: var(--amber); }
+
+  /* przycisk "+ dodaj własną" w nagłówku karty */
+  .add-custom {
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--cyan);
+    background: none;
+    border: 1px solid rgba(167, 139, 250, 0.35);
+    border-radius: 999px;
+    padding: 0.3rem 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .add-custom:hover { background: rgba(167, 139, 250, 0.1); }
+
+  /* plakietka odróżniająca szablony użytkownika od wbudowanych */
+  .badge {
+    margin-left: 0.45rem;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    border: 1px solid rgba(167, 139, 250, 0.35);
+    border-radius: 999px;
+    padding: 0.08rem 0.45rem;
+    vertical-align: middle;
+  }
+
+  .custom-form {
+    margin-top: 0.7rem;
+    padding: 1rem;
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    border-radius: 14px;
+    background: rgba(13, 11, 26, 0.45);
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .cf-intro { font-size: 0.8rem; color: var(--dim); line-height: 1.5; }
+  .cf-intro a { color: var(--cyan); }
+  .cf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 0.7rem;
+  }
+  .cf-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.76rem;
+    color: var(--dim);
+  }
+  .cf-wide { grid-column: 1 / -1; }
+  .cf-note { font-size: 0.68rem; opacity: 0.75; }
+  .cf-grid input {
+    font: inherit;
+    color: var(--text);
+    background: rgba(13, 11, 26, 0.7);
+    border: 1px solid var(--edge);
+    border-radius: 8px;
+    padding: 0.5rem 0.7rem;
+  }
+  .cf-grid input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .custom-form .error { font-size: 0.76rem; color: var(--red); }
+  .install:disabled { opacity: 0.6; cursor: default; }
 </style>
