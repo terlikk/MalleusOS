@@ -251,6 +251,10 @@
     display: flex;
     align-items: center;
     gap: 0.9rem;
+    /* Zainstalowana aplikacja ma aż 4 przyciski — gdy się nie
+       mieszczą obok opisu, cały pasek akcji spada do nowej linii
+       zamiast zgniatać tekst. */
+    flex-wrap: wrap;
   }
 
   /* mini-formularz pól "pytaj" rozwijany pod wierszem */
@@ -304,7 +308,9 @@
     border: 1px solid rgba(167, 139, 250, 0.22);
   }
 
-  .info { min-width: 0; flex: 1; line-height: 1.35; display: flex; flex-direction: column; }
+  /* min-width trzyma opisowi sensowną szerokość — poniżej niej
+     przyciski akcji zawijają się pod spód, a tekst zostaje czytelny */
+  .info { min-width: 11rem; flex: 1; line-height: 1.35; display: flex; flex-direction: column; }
   .info b { font-size: 0.9rem; white-space: nowrap; }
   .info span { font-size: 0.76rem; color: var(--dim); }
   .info .error { color: var(--red); }
@@ -337,7 +343,14 @@
     border-color: rgba(251, 191, 36, 0.25);
   }
 
-  .act { margin-left: auto; flex: none; display: flex; gap: 0.4rem; align-items: center; }
+  .act {
+    margin-left: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    align-items: center;
+  }
 
   .install {
     font: inherit;
