@@ -14,7 +14,8 @@ volumes:
 env:
   - name: USER
     value: malleus;malleus
-    opis: login;hasło do udziału — zmień hasło!
+    opis: login i hasło do dysku, rozdzielone średnikiem (np. filip;mojehaslo)
+    pytaj: true
   - name: SHARE
     value: pliki;/share;yes;no;no;malleus
     opis: definicja udziału (nazwa;ścieżka;przeglądalny;tylko-odczyt;goście;użytkownik)
