@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 	"strconv"
@@ -18,6 +19,9 @@ type SystemInfo struct {
 	Cores         int     `json:"cores"`
 	TotalMemKB    uint64  `json:"totalMemKb"`
 	UptimeSeconds float64 `json:"uptimeSeconds"`
+	// GatewayIP to adres routera (bramy domyślnej) — panel używa
+	// go np. do linku "otwórz panel routera" przy Pi-hole.
+	GatewayIP string `json:"gatewayIp,omitempty"`
 }
 
 // ReadSystemInfo składa informacje o hoście z kilku miejsc:
@@ -60,5 +64,26 @@ func ReadSystemInfo() SystemInfo {
 	if fields := strings.Fields(readTrim("/proc/uptime")); len(fields) > 0 {
 		info.UptimeSeconds, _ = strconv.ParseFloat(fields[0], 64)
 	}
+	info.GatewayIP = defaultGateway()
 	return info
+}
+
+// defaultGateway czyta adres routera z /proc/net/route.
+// Format: wiersze z kolumnami Iface Destination Gateway…, liczby
+// szesnastkowo w odwróconej kolejności bajtów (little-endian).
+// Trasa domyślna ma Destination 00000000.
+func defaultGateway() string {
+	for _, line := range strings.Split(readTrim("/proc/net/route"), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) < 3 || fields[1] != "00000000" {
+			continue
+		}
+		raw, err := strconv.ParseUint(fields[2], 16, 32)
+		if err != nil || raw == 0 {
+			continue
+		}
+		return fmt.Sprintf("%d.%d.%d.%d",
+			raw&0xff, (raw>>8)&0xff, (raw>>16)&0xff, (raw>>24)&0xff)
+	}
+	return ""
 }

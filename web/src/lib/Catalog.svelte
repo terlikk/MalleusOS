@@ -9,6 +9,7 @@
   let apps = $state([]);
   let busy = $state(null); // id aplikacji w trakcie instalacji/usuwania
   let errors = $state({}); // błędy per aplikacja
+  let gateway = $state(""); // adres routera — do linku przy Pi-hole
 
   async function refresh() {
     try {
@@ -19,6 +20,12 @@
       // chwilowy brak API — spróbujemy przy następnym odświeżeniu
     }
   }
+
+  $effect(() => {
+    getJSON("/api/v1/system")
+      .then((s) => (gateway = s.gatewayIp ?? ""))
+      .catch(() => {});
+  });
 
   $effect(() => {
     refresh();
@@ -120,6 +127,11 @@
         {#if app.installed && app.hint}
           <span class="hintline">
             {app.hint.replace("HOST", window.location.hostname)}
+            {#if gateway && app.hint.includes("routera")}
+              <a class="router-link" href={"http://" + gateway} target="_blank" rel="noopener">
+                otwórz panel routera ({gateway}) →
+              </a>
+            {/if}
           </span>
         {/if}
         {#if errors[app.id]}
@@ -268,6 +280,7 @@
   .info .error { color: var(--red); }
   .info .addr { font-size: 0.72rem; color: var(--cyan); opacity: 0.85; }
   .info .hintline { font-size: 0.74rem; color: var(--amber); margin-top: 0.2rem; }
+  .router-link { color: var(--cyan); font-weight: 600; }
 
   .games-head {
     display: flex;
