@@ -7,11 +7,18 @@
 # Jak wydać wersję:
 #   git tag v0.1.0
 #   git push origin v0.1.0
+# albo ręcznie: zakładka Actions → release → Run workflow →
+# wpisz numer (workflow sam utworzy tag przy publikacji).
 name: release
 
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Numer wersji do wydania, np. v0.1.0"
+        required: true
 
 # Domyślny token dostaje prawo zapisu, żeby móc utworzyć Release.
 permissions:
@@ -38,11 +45,15 @@ jobs:
         run: make vet
 
       - name: Binarki amd64 + arm64 z wersją z taga
-        run: make build-all VERSION=${{ github.ref_name }}
+        run: make build-all VERSION=${{ inputs.tag || github.ref_name }}
 
       - name: Opublikuj Release z binarkami
         uses: softprops/action-gh-release@v2
         with:
+          # Przy ręcznym uruchomieniu tag bierze się z pola formularza
+          # (i tworzy się sam); przy pushu taga pole jest puste i akcja
+          # używa taga z gita.
+          tag_name: ${{ inputs.tag || github.ref_name }}
           files: |
             bin/malleus-linux-amd64
             bin/malleus-linux-arm64
