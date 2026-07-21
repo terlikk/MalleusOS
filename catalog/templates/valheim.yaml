@@ -1,0 +1,33 @@
+id: valheim
+name: Valheim
+tagline: Serwer wikingów dla znajomych (wymaga 4 GB RAM)
+image: ghcr.io/lloesche/valheim-server:latest
+webPort: 0
+subdomain: valheim
+kategoria: gry
+connect: "HOST:2456"
+ports:
+  - host: 2456
+    container: 2456
+    protocol: udp
+  - host: 2457
+    container: 2457
+    protocol: udp
+volumes:
+  - name: config
+    path: /config
+    opis: świat i konfiguracja serwera
+env:
+  - name: SERVER_NAME
+    value: Serwer na MalleusOS
+    opis: nazwa widoczna na liście serwerów
+  - name: WORLD_NAME
+    value: MalleusWorld
+    opis: nazwa świata (zmiana = nowy świat)
+  - name: SERVER_PASS
+    value: ""
+    pytaj: true
+    opis: hasło serwera dla graczy (minimum 5 znaków)
+  - name: TZ
+    value: Europe/Warsaw
+    opis: strefa czasowa

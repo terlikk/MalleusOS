@@ -1,0 +1,20 @@
+id: vaultwarden
+name: Vaultwarden
+tagline: Własny menedżer haseł (zgodny z aplikacjami Bitwarden)
+image: vaultwarden/server:latest
+webPort: 8084
+subdomain: hasla
+ports:
+  - host: 8084
+    container: 80
+volumes:
+  - name: data
+    path: /data
+    opis: zaszyfrowany sejf z hasłami
+env:
+  - name: TZ
+    value: Europe/Warsaw
+    opis: strefa czasowa
+  - name: SIGNUPS_ALLOWED
+    value: "true"
+    opis: pozwól zakładać konta (wyłącz po założeniu swojego!)

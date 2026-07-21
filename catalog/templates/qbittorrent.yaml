@@ -1,0 +1,31 @@
+id: qbittorrent
+name: qBittorrent
+tagline: Pobieranie torrentów z panelem w przeglądarce
+image: lscr.io/linuxserver/qbittorrent:latest
+webPort: 8085
+subdomain: torrenty
+hint: >-
+  Hasło pierwszego logowania znajdziesz w logach kontenera
+  (przycisk "logi" w karcie Kontenery).
+ports:
+  - host: 8085
+    container: 8085
+  - host: 6881
+    container: 6881
+  - host: 6881
+    container: 6881
+    protocol: udp
+volumes:
+  - name: config
+    path: /config
+    opis: konfiguracja
+  - name: downloads
+    path: /downloads
+    opis: pobrane pliki
+env:
+  - name: TZ
+    value: Europe/Warsaw
+    opis: strefa czasowa
+  - name: WEBUI_PORT
+    value: "8085"
+    opis: port panelu WWW
