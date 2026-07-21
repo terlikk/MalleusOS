@@ -31,6 +31,11 @@ i tryb kiosku na wbudowany ekranik LCD.
 - **Deploy własnych aplikacji** — wskazujesz repozytorium git albo ZIP,
   serwer buduje i uruchamia projekt, logi budowania na żywo.
 - **Panel zamknięty na hasło** — logowanie od pierwszego uruchomienia.
+- **Aktualizacje jednym kliknięciem** — i aplikacji (nowy obraz,
+  dane zostają), i samego MalleusOS (panel wykrywa nowe wydanie).
+- **Kopie zapasowe** — dane każdej aplikacji do pobrania jako tar.gz.
+- **HTTPS** — flaga `-tls` włącza szyfrowanie z automatycznym
+  certyfikatem (samopodpisany — przeglądarka ostrzeże raz).
 - **Tryb kiosku** — widok metryk pod mały panoramiczny ekran LCD.
 
 ## Jak to działa

@@ -73,22 +73,27 @@ func New(cfg Config) *Server {
 	s.mux.HandleFunc("POST /api/v1/catalog/{id}/uninstall", s.protect(s.handleCatalogUninstall))
 	s.mux.HandleFunc("GET /api/v1/catalog/{id}/backup", s.protect(s.handleCatalogBackup))
 	s.mux.HandleFunc("POST /api/v1/catalog/{id}/update", s.protect(s.handleCatalogUpdate))
+	s.mux.HandleFunc("GET /api/v1/update", s.protect(s.handleUpdateCheck))
+	s.mux.HandleFunc("POST /api/v1/update", s.protect(s.handleUpdateApply))
 	s.mux.HandleFunc("GET /api/v1/projects", s.protect(s.handleProjects))
 	s.mux.HandleFunc("POST /api/v1/projects", s.protect(s.handleProjectCreate))
 	s.mux.HandleFunc("DELETE /api/v1/projects/{name}", s.protect(s.handleProjectDelete))
 	return s
 }
 
-// ListenAndServe blokuje aż do zamknięcia serwera.
-func (s *Server) ListenAndServe(addr string) error {
-	srv := &http.Server{
-		Addr:    addr,
-		Handler: s.mux,
-		// Limit na nagłówki chroni przed wiszącymi połączeniami.
-		// Celowo brak limitu na całą odpowiedź — SSE żyje godzinami.
+// newHTTPServer buduje serwer z naszymi limitami czasu.
+// Limit tylko na nagłówki — SSE i logi żyją godzinami.
+func newHTTPServer(addr string, h http.Handler) *http.Server {
+	return &http.Server{
+		Addr:              addr,
+		Handler:           h,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
-	return srv.ListenAndServe()
+}
+
+// ListenAndServe blokuje aż do zamknięcia serwera.
+func (s *Server) ListenAndServe(addr string) error {
+	return newHTTPServer(addr, s.mux).ListenAndServe()
 }
 
 // writeJSON serializuje v i wysyła z właściwym nagłówkiem.

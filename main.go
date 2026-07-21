@@ -31,6 +31,7 @@ func main() {
 	dockerSock := flag.String("docker-sock", "/var/run/docker.sock", "socket Dockera (albo atrapy fakedocker)")
 	proxyAddr := flag.String("proxy", ":80", "adres reverse proxy dla adresów .malleus.local (puste = wyłącz)")
 	mdnsOn := flag.Bool("mdns", true, "rozgłaszaj nazwy .malleus.local w sieci lokalnej (mDNS)")
+	useTLS := flag.Bool("tls", false, "serwuj panel po HTTPS (certyfikat samopodpisany w katalogu danych)")
 	flag.Parse()
 
 	kolektor := agent.NewCollector()
@@ -97,6 +98,14 @@ func main() {
 				log.Printf("mdns: %v — nazwy .malleus.local nie będą rozgłaszane", err)
 			}
 		}()
+	}
+	if *useTLS {
+		cert, key, err := server.EnsureCert(*dataDir)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("malleus %s — panel pod https://localhost%s", version, *addr)
+		log.Fatal(srv.ListenAndServeTLS(*addr, cert, key))
 	}
 	log.Printf("malleus %s — panel pod http://localhost%s", version, *addr)
 	if err := srv.ListenAndServe(*addr); err != nil {
