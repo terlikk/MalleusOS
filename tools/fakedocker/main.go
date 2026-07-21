@@ -122,6 +122,17 @@ func main() {
 		})
 	}
 
+	mux.HandleFunc("GET /containers/{id}/stats", func(w http.ResponseWriter, r *http.Request) {
+		if find(r.PathValue("id")) == nil {
+			http.NotFound(w, r)
+			return
+		}
+		// Udawane, ale wiarygodne liczby: precpu/cpu z roznica.
+		fmt.Fprint(w, `{"cpu_stats":{"cpu_usage":{"total_usage":2000000000},"system_cpu_usage":100000000000,"online_cpus":4},
+			"precpu_stats":{"cpu_usage":{"total_usage":1990000000},"system_cpu_usage":99000000000},
+			"memory_stats":{"usage":268435456}}`)
+	})
+
 	// --- budowanie obrazow (Moje projekty) ---
 
 	mux.HandleFunc("POST /build", func(w http.ResponseWriter, r *http.Request) {

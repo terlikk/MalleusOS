@@ -1,7 +1,8 @@
 <script>
-  // Karta kontenerów: lista ze stanami, przyciski akcji
-  // i podgląd logów na żywo (SSE) rozwijany pod wierszem.
+  // Karta kontenerów: lista ze stanami, zużyciem CPU/RAM,
+  // przyciskami akcji i logami na żywo (SSE) pod wierszem.
   import { getJSON } from "./api.js";
+  import { bytes } from "./format.js";
 
   let available = $state(true);
   let containers = $state([]);
@@ -78,7 +79,7 @@
   {:else}
     <table>
       <thead>
-        <tr><th>Nazwa</th><th>Stan</th><th>Obraz</th><th class="right">Akcje</th></tr>
+        <tr><th>Nazwa</th><th>Stan</th><th>CPU</th><th>RAM</th><th>Obraz</th><th class="right">Akcje</th></tr>
       </thead>
       <tbody>
         {#each containers as c (c.id)}
@@ -89,6 +90,8 @@
                 {c.state === "running" ? "działa" : "zatrzymany"}
               </span>
             </td>
+            <td class="mono usage">{c.state === "running" ? `${c.cpuPercent.toFixed(1)}%` : "—"}</td>
+            <td class="mono usage">{c.state === "running" && c.memBytes > 0 ? bytes(c.memBytes) : "—"}</td>
             <td class="image mono">{c.image}</td>
             <td>
               <div class="btns">
@@ -104,7 +107,7 @@
           </tr>
           {#if logsFor === c.id}
             <tr class="logrow">
-              <td colspan="4">
+              <td colspan="6">
                 <pre bind:this={logBox}>{#each logLines as l}<span
                   class:err={l.stream === "stderr"}>{l.line}
 </span>{/each}</pre>
@@ -133,6 +136,7 @@
 
   .name { font-weight: 600; }
   .image { font-size: 0.78rem; color: var(--dim); }
+  .usage { font-size: 0.78rem; white-space: nowrap; }
 
   .pill {
     display: inline-block;
