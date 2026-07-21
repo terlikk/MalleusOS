@@ -53,6 +53,24 @@ type App struct {
 	// Custom = szablon dodany przez użytkownika z panelu
 	// (nie zapisujemy go w YAML — wynika z miejsca na dysku).
 	Custom bool `yaml:"-" json:"custom,omitempty"`
+	// Pliki = aplikacja potrzebuje plików z treścią (np. paczki
+	// .zim Kiwiksa). Panel pokazuje wtedy "dodaj treść": serwer
+	// pobiera plik prosto do wolumenu i restartuje aplikację.
+	Pliki *Pliki `yaml:"pliki" json:"pliki,omitempty"`
+}
+
+// Pliki opisuje, dokąd i co pobierać przyciskiem "dodaj treść".
+type Pliki struct {
+	Volume string `yaml:"volume" json:"volume"` // nazwa wolumenu z App.Volumes
+	Ext    string `yaml:"ext" json:"ext"`       // wymagane rozszerzenie, np. ".zim"
+	Opis   string `yaml:"opis" json:"opis"`
+	// Propozycje to gotowe paczki do pobrania jednym kliknięciem.
+	Propozycje []Propozycja `yaml:"propozycje" json:"propozycje,omitempty"`
+}
+
+type Propozycja struct {
+	Nazwa string `yaml:"nazwa" json:"nazwa"`
+	URL   string `yaml:"url" json:"url"`
 }
 
 type Port struct {

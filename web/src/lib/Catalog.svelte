@@ -73,6 +73,33 @@
     }
   }
 
+  // Czyta strumień statusów z serwera linia po linii ("pobieranie
+  // obrazu 47%"…) i pokazuje każdą na kafelku. Zwraca true, gdy
+  // operacja skończyła się bez błędu.
+  async function readStatuses(res, app) {
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = "";
+    let failed = false;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split("\n");
+      buf = lines.pop(); // niedokończona linia czeka na resztę
+      for (const ln of lines) {
+        if (!ln.trim() || ln === "OK") continue;
+        if (ln.startsWith("BŁĄD: ")) {
+          errors = { ...errors, [app.id]: ln.slice(6) };
+          failed = true;
+        } else {
+          busyText = ln;
+        }
+      }
+    }
+    return !failed;
+  }
+
   async function install(app) {
     busy = app.id;
     busyText = "instalowanie…";
@@ -87,33 +114,9 @@
         // błąd walidacji (np. puste pole "pytaj") — zwykły JSON
         const body = await res.json();
         errors = { ...errors, [app.id]: body.error };
-      } else {
-        // statusy instalacji płyną linia po linii — pokazujemy
-        // każdą na kafelku ("pobieranie obrazu 47%"…)
-        const reader = res.body.getReader();
-        const dec = new TextDecoder();
-        let buf = "";
-        let failed = false;
-        for (;;) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buf += dec.decode(value, { stream: true });
-          const lines = buf.split("\n");
-          buf = lines.pop(); // niedokończona linia czeka na resztę
-          for (const ln of lines) {
-            if (!ln.trim() || ln === "OK") continue;
-            if (ln.startsWith("BŁĄD: ")) {
-              errors = { ...errors, [app.id]: ln.slice(6) };
-              failed = true;
-            } else {
-              busyText = ln;
-            }
-          }
-        }
-        if (!failed) {
-          formId = null;
-          formValues = {};
-        }
+      } else if (await readStatuses(res, app)) {
+        formId = null;
+        formValues = {};
       }
       await refresh();
     } catch {
@@ -197,6 +200,38 @@
     }
   }
 
+  // "Dodaj treść" (np. paczki .zim Kiwiksa): serwer pobiera plik
+  // prosto do wolumenu aplikacji i restartuje ją — zero terminala.
+  let filesId = $state(null);
+  let fileUrl = $state("");
+
+  async function addFiles(app, url) {
+    busy = app.id;
+    busyText = "pobieranie…";
+    errors = { ...errors, [app.id]: null };
+    notes = { ...notes, [app.id]: null };
+    try {
+      const res = await fetch(`/api/v1/catalog/${app.id}/files`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      if (res.headers.get("content-type")?.includes("json")) {
+        const body = await res.json();
+        errors = { ...errors, [app.id]: body.error };
+      } else if (await readStatuses(res, app)) {
+        filesId = null;
+        fileUrl = "";
+        notes = { ...notes, [app.id]: "treść dodana — aplikacja działa ✓" };
+      }
+      await refresh();
+    } catch {
+      errors = { ...errors, [app.id]: "brak połączenia z serwerem" };
+    } finally {
+      busy = null;
+    }
+  }
+
   async function customDelete(app) {
     if (!confirm(`Usunąć szablon ${app.name} z katalogu?`)) return;
     busy = app.id;
@@ -250,6 +285,11 @@
           {#if app.webPort > 0}
             <a class="open" href={urlFor(app)} target="_blank" rel="noopener">Otwórz</a>
           {/if}
+          {#if app.pliki}
+            <button class="del neutral"
+                    onclick={() => (filesId = filesId === app.id ? null : app.id)}
+                    title={app.pliki.opis}>dodaj treść</button>
+          {/if}
           <button class="del" onclick={() => update(app)}
                   title="Pobierz najnowszą wersję — dane zostają">aktualizuj</button>
           <a class="del" href={`/api/v1/catalog/${app.id}/backup`}
@@ -264,6 +304,25 @@
         {/if}
       </div>
     </div>
+
+    {#if filesId === app.id && busy !== app.id}
+      <div class="ask">
+        <span class="files-opis">{app.pliki.opis}</span>
+        {#each app.pliki.propozycje ?? [] as prop (prop.url)}
+          <button class="propo" onclick={() => addFiles(app, prop.url)}>
+            ⬇ {prop.nazwa}
+          </button>
+        {/each}
+        <label>
+          własny link do pliku {app.pliki.ext}
+          <input bind:value={fileUrl} placeholder={"https://…" + app.pliki.ext} />
+        </label>
+        <div class="ask-actions">
+          <button class="install" onclick={() => addFiles(app, fileUrl)}>Pobierz</button>
+          <button class="cancel" onclick={() => (filesId = null)}>anuluj</button>
+        </div>
+      </div>
+    {/if}
 
     {#if formId === app.id && busy !== app.id}
       <div class="ask">
@@ -526,9 +585,25 @@
     white-space: nowrap;
   }
   .del:hover { color: var(--red); border-color: var(--red); }
-  /* aktualizuj/kopia to nie akcje niszczące — hover na fioletowo */
+  /* aktualizuj/kopia/dodaj treść to nie akcje niszczące — hover fioletowy */
   button.del[title^="Pobierz naj"]:hover,
+  button.del.neutral:hover,
   a.del:hover { color: var(--cyan); border-color: rgba(167, 139, 250, 0.4); }
+
+  /* sekcja "dodaj treść": gotowe paczki + pole na własny link */
+  .files-opis { font-size: 0.74rem; color: var(--dim); }
+  .propo {
+    font: inherit;
+    font-size: 0.8rem;
+    text-align: left;
+    color: var(--cyan);
+    background: rgba(167, 139, 250, 0.08);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    border-radius: 10px;
+    padding: 0.55rem 0.85rem;
+    cursor: pointer;
+  }
+  .propo:hover { background: rgba(167, 139, 250, 0.16); }
 
   .busy { font-size: 0.8rem; color: var(--amber); }
 

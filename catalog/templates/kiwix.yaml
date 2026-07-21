@@ -14,6 +14,15 @@ volumes:
 # kiwix-serve wymaga wskazania plików; * obejmuje wszystkie .zim w /data
 cmd: ["*.zim"]
 hint: >-
-  Kiwix startuje pusty i wyłącza się, dopóki nie dostanie treści.
-  Pobierz paczkę .zim (np. polską Wikipedię) z library.kiwix.org,
-  wgraj do folderu danych aplikacji i uruchom ją ponownie.
+  Kiwix startuje pusty — kliknij "dodaj treść" i wybierz paczkę
+  (np. polską Wikipedię), a MalleusOS pobierze ją i uruchomi
+  aplikację sam.
+pliki:
+  volume: data
+  ext: .zim
+  opis: paczki treści — więcej znajdziesz na library.kiwix.org (skopiuj link do pliku .zim)
+  propozycje:
+    - nazwa: Wikipedia PL bez zdjęć (~2 GB)
+      url: https://download.kiwix.org/zim/wikipedia/wikipedia_pl_all_nopic.zim
+    - nazwa: Wikipedia PL ze zdjęciami (duża, ~15 GB)
+      url: https://download.kiwix.org/zim/wikipedia/wikipedia_pl_all_maxi.zim
