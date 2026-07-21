@@ -187,14 +187,30 @@ func main() {
 	// --- endpointy instalacji (katalog aplikacji) ---
 
 	mux.HandleFunc("POST /images/create", func(w http.ResponseWriter, r *http.Request) {
-		// Udawany postęp pobierania obrazu — kilka linii JSON,
-		// jak z prawdziwego rejestru.
+		// Udawany postęp pobierania obrazu — linie JSON z licznikami
+		// bajtów per warstwa, jak z prawdziwego rejestru. Dwie
+		// warstwy pobierane "równolegle", potem rozpakowywanie.
 		fl := w.(http.Flusher)
-		for _, status := range []string{"Pulling fs layer", "Downloading", "Extracting", "Pull complete"} {
-			fmt.Fprintf(w, `{"status":%q}`+"\n", status)
+		line := func(status, id string, cur, tot int) {
+			fmt.Fprintf(w,
+				`{"status":%q,"id":%q,"progressDetail":{"current":%d,"total":%d}}`+"\n",
+				status, id, cur, tot)
 			fl.Flush()
-			time.Sleep(250 * time.Millisecond)
 		}
+		fmt.Fprintln(w, `{"status":"Pulling fs layer","id":"aa11"}`)
+		fl.Flush()
+		for i := 1; i <= 4; i++ {
+			line("Downloading", "aa11", i*250, 1000)
+			line("Downloading", "bb22", i*500, 2000)
+			time.Sleep(200 * time.Millisecond)
+		}
+		for i := 1; i <= 2; i++ {
+			line("Extracting", "aa11", i*500, 1000)
+			line("Extracting", "bb22", i*1000, 2000)
+			time.Sleep(200 * time.Millisecond)
+		}
+		fmt.Fprintln(w, `{"status":"Pull complete","id":"bb22"}`)
+		fl.Flush()
 	})
 
 	mux.HandleFunc("POST /containers/create", func(w http.ResponseWriter, r *http.Request) {

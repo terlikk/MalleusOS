@@ -7,13 +7,35 @@
   let { system = null, online = false } = $props();
 
   // Samo-aktualizacja: sprawdzamy raz przy starcie, czy na GitHubie
-  // jest nowsze wydanie MalleusOS.
+  // jest nowsze wydanie MalleusOS. Chip w nagłówku jest widoczny
+  // zawsze — można też sprawdzić ręcznie w każdej chwili.
   let update = $state(null);
   let updating = $state(false);
+  let checking = $state(false);
+  let checkMsg = $state("");
 
   $effect(() => {
     getJSON("/api/v1/update").then((u) => (update = u)).catch(() => {});
   });
+
+  async function checkUpdate() {
+    checking = true;
+    checkMsg = "";
+    try {
+      update = await getJSON("/api/v1/update");
+      if (!update.available) {
+        checkMsg = update.current?.includes("dev")
+          ? "wersja deweloperska — aktualizacje z gita"
+          : "masz najnowszą wersję ✓";
+      }
+    } catch {
+      checkMsg = "nie udało się sprawdzić";
+    } finally {
+      checking = false;
+      // komunikat znika sam, chip wraca do zwykłej postaci
+      setTimeout(() => (checkMsg = ""), 5000);
+    }
+  }
 
   async function applyUpdate() {
     if (!confirm(`Zaktualizować MalleusOS do ${update.latest}? Panel zrestartuje się.`)) return;
@@ -39,6 +61,14 @@
     {#if update?.available}
       <button class="chip update" onclick={applyUpdate} disabled={updating}>
         {updating ? "aktualizuję…" : `nowa wersja ${update.latest} — aktualizuj`}
+      </button>
+    {:else}
+      <button class="chip check" onclick={checkUpdate} disabled={checking}
+              title="Sprawdź, czy jest nowe wydanie MalleusOS">
+        {checking
+          ? "sprawdzam…"
+          : checkMsg ||
+            `MalleusOS${update?.current ? " " + update.current : ""} · sprawdź aktualizacje`}
       </button>
     {/if}
     {#if system?.os}<span class="chip">{system.os}</span>{/if}
@@ -104,6 +134,11 @@
     font-weight: 650;
   }
   button.chip.update:disabled { opacity: 0.6; cursor: wait; }
+
+  /* Chip "sprawdź aktualizacje" — dyskretny, ożywa po najechaniu */
+  button.chip.check { font: inherit; font-size: 0.74rem; cursor: pointer; }
+  button.chip.check:hover { color: var(--cyan); border-color: rgba(167, 139, 250, 0.4); }
+  button.chip.check:disabled { cursor: wait; }
 
   @media (prefers-reduced-motion: reduce) {
     .led { animation: none; }

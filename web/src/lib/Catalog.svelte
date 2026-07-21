@@ -83,12 +83,37 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ env: formValues }),
       });
-      const body = await res.json();
-      if (!res.ok) {
+      if (res.headers.get("content-type")?.includes("json")) {
+        // błąd walidacji (np. puste pole "pytaj") — zwykły JSON
+        const body = await res.json();
         errors = { ...errors, [app.id]: body.error };
       } else {
-        formId = null;
-        formValues = {};
+        // statusy instalacji płyną linia po linii — pokazujemy
+        // każdą na kafelku ("pobieranie obrazu 47%"…)
+        const reader = res.body.getReader();
+        const dec = new TextDecoder();
+        let buf = "";
+        let failed = false;
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
+          const lines = buf.split("\n");
+          buf = lines.pop(); // niedokończona linia czeka na resztę
+          for (const ln of lines) {
+            if (!ln.trim() || ln === "OK") continue;
+            if (ln.startsWith("BŁĄD: ")) {
+              errors = { ...errors, [app.id]: ln.slice(6) };
+              failed = true;
+            } else {
+              busyText = ln;
+            }
+          }
+        }
+        if (!failed) {
+          formId = null;
+          formValues = {};
+        }
       }
       await refresh();
     } catch {

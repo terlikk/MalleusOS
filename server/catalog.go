@@ -53,8 +53,13 @@ func (s *Server) handleCatalog(w http.ResponseWriter, r *http.Request) {
 
 // handleCatalogInstall robi całą instalację jednym żądaniem:
 // pobiera obraz, tworzy kontener z portami/wolumenami/env
-// z szablonu i uruchamia go. Może potrwać (pobieranie obrazu!) —
-// panel pokazuje w tym czasie "instalowanie…".
+// z szablonu i uruchamia go.
+//
+// Odpowiedź to strumień linii tekstu ze statusem na żywo
+// ("pobieranie obrazu 47%") — pobieranie obrazu potrafi trwać
+// minutami i panel pokazuje, co się właśnie dzieje. Ostatnia
+// linia to "OK" albo "BŁĄD: opis". Błędy walidacji (przed startem
+// pracy) wracają normalnie jako JSON ze statusem 400.
 //
 // Opcjonalne ciało żądania {"env": {"NAZWA": "wartość"}} pozwala
 // uzupełnić pola oznaczone w szablonie jako pytaj (np. klucz
@@ -92,11 +97,6 @@ func (s *Server) handleCatalogInstall(w http.ResponseWriter, r *http.Request) {
 		}
 		spec.Env = append(spec.Env, e.Name+"="+value)
 	}
-
-	if err := s.docker.PullImage(r.Context(), app.Image); err != nil {
-		writeJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
-		return
-	}
 	for _, p := range app.Ports {
 		spec.Ports = append(spec.Ports, docker.PortMap{
 			Host: p.Host, Container: p.Container, Protocol: p.Protocol,
@@ -109,15 +109,33 @@ func (s *Server) handleCatalogInstall(w http.ResponseWriter, r *http.Request) {
 			fmt.Sprintf("malleus-%s-%s:%s", app.ID, v.Name, v.Path))
 	}
 
+	// Od tego miejsca odpowiedź płynie na żywo linia po linii.
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-cache")
+	fl, _ := w.(http.Flusher)
+	say := func(msg string) {
+		fmt.Fprintln(w, msg)
+		if fl != nil {
+			fl.Flush()
+		}
+	}
+
+	say("pobieranie obrazu…")
+	if err := s.docker.PullImageProgress(r.Context(), app.Image, say); err != nil {
+		say("BŁĄD: " + err.Error())
+		return
+	}
+	say("tworzenie kontenera…")
 	if err := s.docker.CreateContainer(r.Context(), app.ID, spec); err != nil {
-		writeJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		say("BŁĄD: " + err.Error())
 		return
 	}
+	say("uruchamianie…")
 	if err := s.docker.Action(r.Context(), app.ID, "start"); err != nil {
-		writeJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		say("BŁĄD: " + err.Error())
 		return
 	}
-	writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
+	say("OK")
 }
 
 // handleCatalogUpdate aktualizuje aplikację do najnowszego obrazu:

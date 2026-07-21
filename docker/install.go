@@ -12,11 +12,17 @@ import (
 	"strings"
 )
 
-// PullImage pobiera obraz z rejestru. Docker strumieniuje postęp
-// jako linie JSON — czytamy je do końca i wyłapujemy błędy
-// (np. "obraz nie istnieje"). Bez limitu czasu: duże obrazy na
-// wolnym łączu potrafią schodzić długo, o przerwaniu decyduje ctx.
+// PullImage pobiera obraz z rejestru (bez raportowania postępu).
 func (c *Client) PullImage(ctx context.Context, image string) error {
+	return c.PullImageProgress(ctx, image, nil)
+}
+
+// PullImageProgress pobiera obraz i przez onStatus melduje postęp
+// po ludzku ("pobieranie obrazu 47%"). Docker strumieniuje linie
+// JSON z licznikami bajtów per warstwa obrazu — sumujemy je
+// w jeden procent. Bez limitu czasu: duże obrazy na wolnym łączu
+// potrafią schodzić długo, o przerwaniu decyduje ctx.
+func (c *Client) PullImageProgress(ctx context.Context, image string, onStatus func(string)) error {
 	u := "http://docker/images/create?fromImage=" + url.QueryEscape(image)
 	req, err := http.NewRequestWithContext(ctx, "POST", u, nil)
 	if err != nil {
@@ -32,14 +38,56 @@ func (c *Client) PullImage(ctx context.Context, image string) error {
 		return fmt.Errorf("pobieranie obrazu: %s (%s)", res.Status, strings.TrimSpace(string(body)))
 	}
 
+	// Postęp per warstwa: obraz to kilka(naście) warstw pobieranych
+	// równolegle, każda melduje osobno ile już zeszło.
+	type layer struct{ cur, tot int64 }
+	download := map[string]*layer{}
+	extract := map[string]*layer{}
+	last := ""
+	report := func(msg string) {
+		if onStatus != nil && msg != last {
+			last = msg
+			onStatus(msg)
+		}
+	}
+	percent := func(m map[string]*layer) int {
+		var cur, tot int64
+		for _, l := range m {
+			cur, tot = cur+l.cur, tot+l.tot
+		}
+		if tot == 0 {
+			return 0
+		}
+		return int(cur * 100 / tot)
+	}
+
 	sc := bufio.NewScanner(res.Body)
 	sc.Buffer(make([]byte, 0, 64*1024), 512*1024)
 	for sc.Scan() {
 		var line struct {
-			Error string `json:"error"`
+			Status         string `json:"status"`
+			ID             string `json:"id"`
+			Error          string `json:"error"`
+			ProgressDetail struct {
+				Current int64 `json:"current"`
+				Total   int64 `json:"total"`
+			} `json:"progressDetail"`
 		}
-		if json.Unmarshal(sc.Bytes(), &line) == nil && line.Error != "" {
+		if json.Unmarshal(sc.Bytes(), &line) != nil {
+			continue
+		}
+		if line.Error != "" {
 			return fmt.Errorf("pobieranie obrazu: %s", line.Error)
+		}
+		switch line.Status {
+		case "Downloading":
+			download[line.ID] = &layer{line.ProgressDetail.Current, line.ProgressDetail.Total}
+			report(fmt.Sprintf("pobieranie obrazu %d%%", percent(download)))
+		case "Extracting":
+			extract[line.ID] = &layer{line.ProgressDetail.Current, line.ProgressDetail.Total}
+			report(fmt.Sprintf("rozpakowywanie %d%%", percent(extract)))
+		case "Pulling fs layer":
+			report("pobieranie obrazu…")
 		}
 	}
 	return sc.Err()
