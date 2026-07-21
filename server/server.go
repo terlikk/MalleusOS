@@ -71,6 +71,8 @@ func New(cfg Config) *Server {
 	s.mux.HandleFunc("GET /api/v1/catalog", s.protect(s.handleCatalog))
 	s.mux.HandleFunc("POST /api/v1/catalog/{id}/install", s.protect(s.handleCatalogInstall))
 	s.mux.HandleFunc("POST /api/v1/catalog/{id}/uninstall", s.protect(s.handleCatalogUninstall))
+	s.mux.HandleFunc("GET /api/v1/catalog/{id}/backup", s.protect(s.handleCatalogBackup))
+	s.mux.HandleFunc("POST /api/v1/catalog/{id}/update", s.protect(s.handleCatalogUpdate))
 	s.mux.HandleFunc("GET /api/v1/projects", s.protect(s.handleProjects))
 	s.mux.HandleFunc("POST /api/v1/projects", s.protect(s.handleProjectCreate))
 	s.mux.HandleFunc("DELETE /api/v1/projects/{name}", s.protect(s.handleProjectDelete))

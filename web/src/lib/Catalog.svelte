@@ -7,8 +7,10 @@
 
   let available = $state(true);
   let apps = $state([]);
-  let busy = $state(null); // id aplikacji w trakcie instalacji/usuwania
+  let busy = $state(null); // id aplikacji w trakcie akcji
+  let busyText = $state("instalowanie…");
   let errors = $state({}); // błędy per aplikacja
+  let notes = $state({}); // komunikaty sukcesu (np. wynik aktualizacji)
   let gateway = $state(""); // adres routera — do linku przy Pi-hole
 
   async function refresh() {
@@ -51,8 +53,29 @@
     install(app);
   }
 
+  // Aktualizacja: pobierz nowy obraz i przelej kontener
+  // (dane i ustawienia zostają — patrz backend).
+  async function update(app) {
+    busy = app.id;
+    busyText = "aktualizowanie…";
+    errors = { ...errors, [app.id]: null };
+    notes = { ...notes, [app.id]: null };
+    try {
+      const res = await fetch(`/api/v1/catalog/${app.id}/update`, { method: "POST" });
+      const body = await res.json();
+      if (!res.ok) errors = { ...errors, [app.id]: body.error };
+      else notes = { ...notes, [app.id]: body.message };
+      await refresh();
+    } catch {
+      errors = { ...errors, [app.id]: "brak połączenia z serwerem" };
+    } finally {
+      busy = null;
+    }
+  }
+
   async function install(app) {
     busy = app.id;
+    busyText = "instalowanie…";
     errors = { ...errors, [app.id]: null };
     try {
       const res = await fetch(`/api/v1/catalog/${app.id}/install`, {
@@ -137,14 +160,21 @@
         {#if errors[app.id]}
           <span class="error">{errors[app.id]}</span>
         {/if}
+        {#if notes[app.id]}
+          <span class="addr">{notes[app.id]}</span>
+        {/if}
       </div>
       <div class="act">
         {#if busy === app.id}
-          <span class="busy">instalowanie…</span>
+          <span class="busy">{busyText}</span>
         {:else if app.installed}
           {#if app.webPort > 0}
             <a class="open" href={urlFor(app)} target="_blank" rel="noopener">Otwórz</a>
           {/if}
+          <button class="del" onclick={() => update(app)}
+                  title="Pobierz najnowszą wersję — dane zostają">aktualizuj</button>
+          <a class="del" href={`/api/v1/catalog/${app.id}/backup`}
+             title="Pobierz kopię zapasową danych (tar.gz)">kopia</a>
           <button class="del" onclick={() => uninstall(app)} title="Usuń aplikację">usuń</button>
         {:else if available}
           <button class="install" onclick={() => startInstall(app)}>Zainstaluj</button>
@@ -341,8 +371,13 @@
     border-radius: 999px;
     padding: 0.4rem 0.8rem;
     cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
   }
   .del:hover { color: var(--red); border-color: var(--red); }
+  /* aktualizuj/kopia to nie akcje niszczące — hover na fioletowo */
+  button.del[title^="Pobierz naj"]:hover,
+  a.del:hover { color: var(--cyan); border-color: rgba(167, 139, 250, 0.4); }
 
   .busy { font-size: 0.8rem; color: var(--amber); }
 </style>

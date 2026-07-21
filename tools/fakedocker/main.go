@@ -98,14 +98,40 @@ func main() {
 	})
 
 	mux.HandleFunc("GET /containers/{id}/json", func(w http.ResponseWriter, r *http.Request) {
-		if find(r.PathValue("id")) == nil {
+		c := find(r.PathValue("id"))
+		if c == nil {
 			http.NotFound(w, r)
 			return
 		}
 		// Tty=false → malleus musi rozplatać ramki, jak przy
-		// prawdziwym Dockerze.
-		fmt.Fprint(w, `{"Config":{"Tty":false}}`)
+		// prawdziwym Dockerze. Image/Env/HostConfig — dla aktualizacji.
+		json.NewEncoder(w).Encode(map[string]any{
+			"Image":  "sha256:" + c.Image,
+			"Config": map[string]any{"Tty": false, "Env": []string{"TZ=Europe/Warsaw"}, "Labels": map[string]string{}},
+			"HostConfig": map[string]any{
+				"Binds": []string{}, "NetworkMode": "bridge",
+				"PortBindings": map[string]any{},
+			},
+		})
 	})
+
+	mux.HandleFunc("GET /images/{name}/json", func(w http.ResponseWriter, r *http.Request) {
+		// ID pochodzi od nazwy obrazu — zgadza się z kontenerem,
+		// więc aktualizacja odpowie "masz już najnowszą wersję".
+		json.NewEncoder(w).Encode(map[string]string{
+			"Id": "sha256:" + r.PathValue("name"),
+		})
+	})
+
+	mux.HandleFunc("GET /volumes/{name}", func(w http.ResponseWriter, r *http.Request) {
+		// Udawany wolumen: prawdziwy katalog z plikiem, żeby kopia
+		// zapasowa miała co pakować.
+		dir := "/tmp/fakevols/" + r.PathValue("name")
+		os.MkdirAll(dir, 0o755)
+		os.WriteFile(dir+"/przykladowe-dane.txt", []byte("dane aplikacji\n"), 0o644)
+		json.NewEncoder(w).Encode(map[string]string{"Mountpoint": dir})
+	})
+
 
 	for _, action := range []string{"start", "stop", "restart"} {
 		newState := map[string]string{"start": "running", "stop": "exited", "restart": "running"}[action]
