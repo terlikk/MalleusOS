@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"malleus/agent"
+	"malleus/catalog"
 	"malleus/docker"
 	"malleus/mdns"
 	"malleus/server"
@@ -35,6 +36,10 @@ func main() {
 	flag.Parse()
 
 	kolektor := agent.NewCollector()
+
+	// Własne szablony aplikacji (dodawane z panelu) lądują jako
+	// pliki YAML obok bazy — przetrwają restart i aktualizację.
+	catalog.UserDir = filepath.Join(*dataDir, "templates")
 
 	// Historia próbek: najpierw próbujemy SQLite (przetrwa restart);
 	// gdy się nie uda (np. katalog tylko do odczytu), łagodnie

@@ -1,18 +1,28 @@
 // Pakiet catalog trzyma szablony aplikacji do instalacji jednym
 // kliknięciem. Szablony to pliki YAML w templates/ — wkompilowane
 // w binarkę przez embed, więc katalog działa offline.
+// Do tego dochodzą szablony własne użytkownika: pliki YAML
+// w katalogu danych (UserDir), dopisywane z panelu.
 package catalog
 
 import (
 	"embed"
 	"fmt"
+	"os"
+	"path/filepath"
+	"regexp"
 	"sort"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
 
 //go:embed templates/*.yaml
 var files embed.FS
+
+// UserDir to katalog na szablony użytkownika (np. data/templates).
+// Puste = własne szablony wyłączone. Ustawiane raz przy starcie.
+var UserDir string
 
 // App to jeden szablon z katalogu. Pola opisane w jellyfin.yaml.
 type App struct {
@@ -40,6 +50,9 @@ type App struct {
 	// (HOST podmieniany na adres serwera) — np. krok z routerem
 	// przy Pi-hole, którego nie da się zautomatyzować.
 	Hint string `yaml:"hint" json:"hint,omitempty"`
+	// Custom = szablon dodany przez użytkownika z panelu
+	// (nie zapisujemy go w YAML — wynika z miejsca na dysku).
+	Custom bool `yaml:"-" json:"custom,omitempty"`
 }
 
 type Port struct {
@@ -63,7 +76,8 @@ type EnvVar struct {
 	Pytaj bool `yaml:"pytaj" json:"pytaj,omitempty"`
 }
 
-// Load wczytuje i parsuje wszystkie szablony (posortowane po nazwie).
+// Load wczytuje i parsuje wszystkie szablony (posortowane po nazwie):
+// najpierw wbudowane, potem własne użytkownika z UserDir.
 func Load() ([]App, error) {
 	entries, err := files.ReadDir("templates")
 	if err != nil {
@@ -86,8 +100,73 @@ func Load() ([]App, error) {
 		apps = append(apps, app)
 	}
 
+	// Szablony użytkownika. Zepsuty plik nie kładzie całego
+	// katalogu — pomijamy go (użytkownik mógł edytować ręcznie).
+	// Wbudowane id mają pierwszeństwo, duplikat pomijamy.
+	if UserDir != "" {
+		seen := map[string]bool{}
+		for _, a := range apps {
+			seen[a.ID] = true
+		}
+		userFiles, _ := filepath.Glob(filepath.Join(UserDir, "*.yaml"))
+		for _, f := range userFiles {
+			data, err := os.ReadFile(f)
+			if err != nil {
+				continue
+			}
+			var app App
+			if err := yaml.Unmarshal(data, &app); err != nil {
+				continue
+			}
+			if app.ID == "" || app.Image == "" || seen[app.ID] {
+				continue
+			}
+			seen[app.ID] = true
+			app.Custom = true
+			apps = append(apps, app)
+		}
+	}
+
 	sort.Slice(apps, func(i, j int) bool { return apps[i].Name < apps[j].Name })
 	return apps, nil
+}
+
+// Slug zamienia nazwę na identyfikator techniczny: "Mój Serwer!"
+// → "moj-serwer". Z takiego id robi się nazwa kontenera i wolumenów.
+func Slug(name string) string {
+	// polskie znaki na łacińskie, reszta nie-alfanumerycznych na "-"
+	repl := strings.NewReplacer(
+		"ą", "a", "ć", "c", "ę", "e", "ł", "l", "ń", "n",
+		"ó", "o", "ś", "s", "ż", "z", "ź", "z",
+	)
+	s := repl.Replace(strings.ToLower(name))
+	s = regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(s, "-")
+	return strings.Trim(s, "-")
+}
+
+// Save zapisuje szablon użytkownika jako YAML w UserDir.
+// Walidację (unikalne id itd.) robi wołający — tu tylko zapis.
+func Save(app App) error {
+	if UserDir == "" {
+		return fmt.Errorf("własne szablony wymagają katalogu danych")
+	}
+	if err := os.MkdirAll(UserDir, 0o755); err != nil {
+		return err
+	}
+	data, err := yaml.Marshal(app)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join(UserDir, app.ID+".yaml"), data, 0o644)
+}
+
+// Delete usuwa szablon użytkownika. Wbudowanych nie da się usunąć —
+// ich pliki siedzą w binarce, nie w UserDir.
+func Delete(id string) error {
+	if UserDir == "" {
+		return fmt.Errorf("własne szablony wymagają katalogu danych")
+	}
+	return os.Remove(filepath.Join(UserDir, id+".yaml"))
 }
 
 // ByID znajduje szablon po identyfikatorze.
