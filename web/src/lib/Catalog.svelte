@@ -117,6 +117,11 @@
             adres w grze: {connectAddr(app)}
           </span>
         {/if}
+        {#if app.installed && app.hint}
+          <span class="hintline">
+            {app.hint.replace("HOST", window.location.hostname)}
+          </span>
+        {/if}
         {#if errors[app.id]}
           <span class="error">{errors[app.id]}</span>
         {/if}
@@ -262,6 +267,7 @@
   .info span { font-size: 0.76rem; color: var(--dim); }
   .info .error { color: var(--red); }
   .info .addr { font-size: 0.72rem; color: var(--cyan); opacity: 0.85; }
+  .info .hintline { font-size: 0.74rem; color: var(--amber); margin-top: 0.2rem; }
 
   .games-head {
     display: flex;

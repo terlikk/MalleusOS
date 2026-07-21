@@ -36,6 +36,10 @@ type App struct {
 	// Network "host" = kontener współdzieli sieć z serwerem
 	// (wymagane np. przez agenta tunelu playit.gg).
 	Network string `yaml:"network" json:"network,omitempty"`
+	// Hint to podpowiedź "co dalej" pokazywana po instalacji
+	// (HOST podmieniany na adres serwera) — np. krok z routerem
+	// przy Pi-hole, którego nie da się zautomatyzować.
+	Hint string `yaml:"hint" json:"hint,omitempty"`
 }
 
 type Port struct {

@@ -4,6 +4,9 @@ tagline: Koniec reklam w całej domowej sieci
 image: pihole/pihole:latest
 webPort: 8082
 subdomain: dns
+hint: >-
+  Ostatni krok: w panelu routera ustaw serwer DNS na HOST —
+  od tej chwili reklamy znikają na każdym urządzeniu w domu.
 ports:
   - host: 8082
     container: 80
@@ -21,5 +24,6 @@ env:
     value: Europe/Warsaw
     opis: strefa czasowa
   - name: WEBPASSWORD
-    value: malleus
-    opis: hasło panelu Pi-hole — zmień po pierwszym logowaniu!
+    value: ""
+    pytaj: true
+    opis: ustaw hasło do panelu Pi-hole (będziesz nim się logować w zakładce Otwórz)
