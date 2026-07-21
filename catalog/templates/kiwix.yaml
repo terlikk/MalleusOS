@@ -13,3 +13,7 @@ volumes:
     opis: pliki .zim (paczki treści — pobierz z library.kiwix.org)
 # kiwix-serve wymaga wskazania plików; * obejmuje wszystkie .zim w /data
 cmd: ["*.zim"]
+hint: >-
+  Kiwix startuje pusty i wyłącza się, dopóki nie dostanie treści.
+  Pobierz paczkę .zim (np. polską Wikipedię) z library.kiwix.org,
+  wgraj do folderu danych aplikacji i uruchom ją ponownie.
