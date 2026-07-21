@@ -24,6 +24,9 @@ i tryb kiosku na wbudowany ekranik LCD.
   chmura), Pi-hole (blokowanie reklam), Samba (dysk sieciowy), Uptime Kuma
   (monitoring usług), Kiwix (Wikipedia offline) — instalacja jednym
   kliknięciem, adresy w rodzaju `nazwa.malleus.local`.
+- **Własne szablony** — dowolna aplikacja z Docker Huba przez prosty
+  formularz w panelu; dostaje instalację, aktualizacje i kopie zapasowe
+  jak apki wbudowane (szablon ląduje jako YAML w `data/templates/`).
 - **Serwery gier** — Minecraft Java i Bedrock jednym kliknięciem;
   panel od razu pokazuje adres, który znajomi wpisują w grze.
   Znajomi spoza domu? Tunel playit.gg też stawia się z katalogu —
